@@ -1,13 +1,13 @@
 from pydantic import BaseModel, ConfigDict
 
-from core.domain.book import Book, Category
+from core.domain.book import Book
 
 class BookDTO(BaseModel):
     id: int
     title: str
     author: str
     description: str
-    category: Category
+    category: str
     isbn: str
     publication_year: str
     available: bool
@@ -15,7 +15,6 @@ class BookDTO(BaseModel):
     model_config = ConfigDict(
         from_atributes=True,
         extra="ignore",
-        arbitrary_types_allowed=True,
     )
     
 

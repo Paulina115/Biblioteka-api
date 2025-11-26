@@ -11,6 +11,5 @@ class UserDTO(BaseModel):
     model_config = ConfigDict(
         from_atributes=True,
         extra="ignore",
-        arbitrary_types_allowed=True,
     )
     
