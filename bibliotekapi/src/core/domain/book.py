@@ -1,16 +1,5 @@
 from dataclasses import dataclass
 
-@dataclass
-class Author:
-    id: int
-    name: str
-
-
-@dataclass
-class Category:
-    id: int
-    name: str
-
 
 @dataclass
 class Book:
@@ -18,7 +7,7 @@ class Book:
     title: str
     author: str
     description: str
-    category: Category
+    category: str
     isbn: str
     publication_year: str
     available: bool

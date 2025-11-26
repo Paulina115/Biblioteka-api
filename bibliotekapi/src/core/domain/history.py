@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 
 @dataclass
-
 class History:
     id: int
     user_id: int
