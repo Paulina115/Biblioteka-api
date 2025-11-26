@@ -69,11 +69,27 @@ class BookRepository(IBookRepository):
 
     async def add_book(self, book: Book) -> None:
         query = (
-            Book.insert().values()
+            book.insert().values(**book.model_dump())
         )
+        new_book_id = await database.execute(query)
+        new_book = await self.get_book_by_id(new_book_id)
+
+        return Book(**dict(new_book)) if new_book else None
 
     async def update_book(self, id: int,data: Book) -> None:
-        pass
+        if self.get_book_by_id(id):
+            query = (
+                book_table.update()
+                .where(book_table.c.id == id)
+                .values(**data.model_dump())
+            )
+            await database.execute(query)
+        
+        new_book = await self.get_book_by_id(id)
+
+        return Book(**dict(new_book)) if new_book else None
+
+
 
     async def delete_book(self, book: Book) -> None:
         pass
