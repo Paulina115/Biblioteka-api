@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Iterable
 
-from bibliotekapi.core.domain.book import Book
+from bibliotekapi.src.core.domain.book import Book
 
 
 class IBookRepository(ABC):
@@ -11,19 +11,19 @@ class IBookRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_book_by_id(self, id: int) -> Book:
+    async def get_book_by_id(self, id: int) -> Book | None:
         pass
 
     @abstractmethod
-    async def get_by_title(self, title: str) -> Book:
+    async def get_by_title(self, title: str) -> Book | None:
         pass
 
     @abstractmethod
-    async def get_by_author(self, author: str) -> Book:
+    async def get_by_author(self, author: str) -> Iterable[Book] | None:
         pass
 
     @abstractmethod
-    async def get_by_isbn(self, isbn: str) -> Book:
+    async def get_by_isbn(self, isbn: str) -> Book | None:
         pass
     
     @abstractmethod
