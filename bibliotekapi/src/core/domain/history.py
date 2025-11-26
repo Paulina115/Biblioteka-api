@@ -1,9 +1,12 @@
 from dataclasses import dataclass
+from datetime import datetime
 
 @dataclass
 class History:
     id: int
     user_id: int
     book_id: int
-    reservation_date: str
+    borrowed_date: datetime
+    due_date: datetime
+    return_date: datetime | None
     status: str

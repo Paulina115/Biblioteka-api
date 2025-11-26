@@ -8,7 +8,7 @@ class Book:
     description: str
     category: str
     isbn: str
-    publication_year: str
+    publication_year: int
     available: bool
     
 
