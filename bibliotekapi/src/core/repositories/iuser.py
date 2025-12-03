@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Iterable
 
-from bibliotekapi.core.domain.user import User
+from src.core.domain.user import User
 
 
 class IUserRepository(ABC):

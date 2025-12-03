@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Iterable
 
-from bibliotekapi.src.core.domain.book import Book
+from src.core.domain.book import Book
 
 
 class IBookRepository(ABC):

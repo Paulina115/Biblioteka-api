@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Iterable
 
-from bibliotekapi.core.domain.reservation import Reservation
+from src.core.domain.reservation import Reservation
 
 
 class IReservationRepository(ABC):

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Iterable
 
-from bibliotekapi.core.domain.history import History
+from src.core.domain.history import History
 
 
 class IHistoryRepository(ABC):
