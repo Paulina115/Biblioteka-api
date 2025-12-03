@@ -8,7 +8,7 @@ from src.core.repositories.ibook import IBookRepository
 from src.core.repositories.ihistory import IHistoryRepository
 from src.infrastructure.services.ireservation import IReservationService
 
-class HistoryService(IReservationService):
+class ReservationService(IReservationService):
 
     _repository: IReservationRepository
     _book_repository: IBookRepository
