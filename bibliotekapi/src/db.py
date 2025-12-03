@@ -11,6 +11,8 @@ from asyncpg.exceptions import (    # type: ignore
     ConnectionDoesNotExistError,
 )
 
+from src.config import config
+
 metadata = sqlalchemy.MetaData()
 
 book_table = sqlalchemy.Table(
@@ -76,10 +78,7 @@ engine = create_async_engine(
     pool_pre_ping=True,
 )
 
-database = databases.Database(
-    db_uri,
-    force_rollback=True,
-)
+database = databases.Database(db_uri)
 
 
 async def init_db(retries: int = 5, delay: int = 5) -> None:

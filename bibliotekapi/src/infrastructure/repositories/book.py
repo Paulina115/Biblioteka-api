@@ -1,5 +1,6 @@
 from typing import Any, Iterable
 
+from asyncpg import Record  # type: ignore
 from sqlalchemy import select,join
 
 from core.repositories.ibook import IBookRepository
@@ -24,7 +25,7 @@ class BookRepository(IBookRepository):
 
     async def get_book_by_id(self, id: int) -> Book | None:
         query = ( 
-            select(book_table).where(book_table.id == id)
+            select(book_table).where(book_table.c.id == id)
         )
         book = await database.fetch_one(query)
         
@@ -32,7 +33,7 @@ class BookRepository(IBookRepository):
 
     async def get_by_title(self, title: str) -> Book | None:
         query = ( 
-            select(book_table).where(book_table.title == title)
+            select(book_table).where(book_table.c.title == title)
         )
         book = await database.fetch_one(query)
 
@@ -41,7 +42,7 @@ class BookRepository(IBookRepository):
 
     async def get_by_author(self, author: str) -> Iterable[Book] | None:
         query = (
-            select(book_table).where(book_table.author == author)
+            select(book_table).where(book_table.c.author == author)
         )
         books = await database.fetch_all(query)
 
@@ -51,7 +52,7 @@ class BookRepository(IBookRepository):
 
     async def get_by_isbn(self, isbn: str) -> Book | None:
         query = (
-            select(book_table).where(book_table.isbn == isbn)
+            select(book_table).where(book_table.c.isbn == isbn)
         )
         book = await database.fetch_one(query)
 
@@ -69,7 +70,7 @@ class BookRepository(IBookRepository):
 
     async def add_book(self, book: Book) -> None:
         query = (
-            book.insert().values(**book.model_dump())
+            book_table.insert().values(**book.model_dump())
         )
         new_book_id = await database.execute(query)
         new_book = await self.get_book_by_id(new_book_id)
@@ -85,14 +86,32 @@ class BookRepository(IBookRepository):
             )
             await database.execute(query)
         
-        new_book = await self.get_book_by_id(id)
+            book = await self.get_book_by_id(id)
 
-        return Book(**dict(new_book)) if new_book else None
+            return Book(**dict(book)) if book else None
+        return None
 
 
 
-    async def delete_book(self, book: Book) -> None:
-        pass
+    async def delete_book(self, book_id: int) -> None:
+        if self._get_book_by_id(book_id):
+            query = ( book_table
+            .delete()
+            .where(book_table.c.id == book_id)
+            )
+            await database.execute(query)
+
+            return True 
+        return False
+    async def _get_book_by_id(self, id: int) -> Record | None:
+        query = (
+            book_table.select()
+            .where(book_table.c.id == id)
+            .order_by(book_table.c.title.asc())
+        )
+
+        return await database.fetch_one(query)
+
 
 
 

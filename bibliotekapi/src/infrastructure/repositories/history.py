@@ -1,11 +1,11 @@
 from typing import Any, Iterable
 
+from asyncpg import Record  # type: ignore
 from sqlalchemy import select,join
 
 from core.repositories.ihistory import IHistoryRepository
 from core.domain.history import History
 from src.db import (
-    book_table,
     history_table,
     user_table,
     database,
@@ -52,3 +52,11 @@ class HistoryRepository(IHistoryRepository):
         new_history = await self.get_history_by_id(id)
 
         return History(**dict(new_history)) if new_history else None
+    
+    async def _get_history_by_id(self, id: int) -> Record | None:
+        query = (
+            history_table.select()
+            .where(history_table.c.id == id)
+        )
+
+        return await database.fetch_one(query)

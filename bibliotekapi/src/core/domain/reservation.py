@@ -3,7 +3,7 @@ from datetime import datetime
 
 @dataclass
 class Reservation:
-    id: int
+    id: int | None
     user_id: int
     book_id: int
     reservation_date: datetime

@@ -19,5 +19,5 @@ class IHistoryRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_history(self, id: int) -> None:
+    async def update_history(self, id: int, data: History) -> None:
         pass

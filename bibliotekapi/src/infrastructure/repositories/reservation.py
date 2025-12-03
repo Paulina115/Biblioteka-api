@@ -1,6 +1,6 @@
 from typing import Any, Iterable
 
-from asyncpg import Record
+from asyncpg import Record  # type: ignore
 from sqlalchemy import select
 
 from core.repositories.ireservation import IReservationRepository
@@ -38,7 +38,7 @@ class ReservationRepository(IReservationRepository):
         )
         reservations = await database.fetch_all(query)
 
-        return [ReservationDTO.from_record(Reservation) for reservation in reservations]
+        return [ReservationDTO.from_record(reservation) for reservation in reservations]
 
     async def get_reservation_by_book(self, book_id: int) -> Reservation | None:
         query = (
@@ -58,7 +58,7 @@ class ReservationRepository(IReservationRepository):
         return Reservation(**dict(new_reservation)) if new_reservation else None
 
     async def update_reservation(self, id: int,data: Reservation) -> None:
-        if self.get_reservation_by_id(id):
+        if self._get_reservation_by_id(id):
             query = (
                 reservation_table.update()
                 .where(reservation_table.c.id == id)
@@ -66,7 +66,7 @@ class ReservationRepository(IReservationRepository):
             )
             await database.execute(query)
         
-            reservation = await self.get_book_by_id(id)
+            reservation = await self.get_reservation_by_id(id)
 
             return Reservation(**dict(reservation)) if reservation else None
         return None
@@ -74,7 +74,7 @@ class ReservationRepository(IReservationRepository):
 
 
     async def cancel_reservation(self, id: int) -> None:
-        if self.get_reservation_by_id():
+        if self._get_reservation_by_id(id):
             query = ( reservation_table
             .delete()
             .where(reservation_table.c.id == id)
@@ -85,8 +85,10 @@ class ReservationRepository(IReservationRepository):
         return False
     
 
-    async def _get_by_id(self, id: int) -> Record | None:
+    async def _get_reservation_by_id(self, id: int) -> Record | None:
         query = (
             reservation_table.select()
             .where(reservation_table.c.id == id)
         )
+
+        return await database.fetch_one(query)

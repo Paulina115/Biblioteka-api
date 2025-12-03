@@ -36,10 +36,10 @@ class IReservationService(ABC):
         pass
 
     @abstractmethod
-    async def reserve_book(self, user_id: int, book_id: int) -> None:
+    async def reserve_book(self, user_id: int, book_id: int) -> Reservation:
         pass
 
     @abstractmethod
-    async def return_book(self, reservation_id: int) -> None:
+    async def return_book(self, user_id: int, book_id) -> Reservation:
         pass
 
