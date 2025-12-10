@@ -3,8 +3,8 @@ from typing import Any, Iterable
 from asyncpg import Record  # type: ignore
 from sqlalchemy import select
 
-from core.repositories.ireservation import IReservationRepository
-from core.domain.reservation import Reservation
+from src.core.repositories.ireservation import IReservationRepository
+from src.core.domain.reservation import Reservation
 from src.db import (
     reservation_table,
     user_table,

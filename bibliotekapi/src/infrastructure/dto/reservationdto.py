@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
-from core.domain.reservation import Reservation
+from src.core.domain.reservation import Reservation
 
 
 class ReservationDTO(BaseModel):

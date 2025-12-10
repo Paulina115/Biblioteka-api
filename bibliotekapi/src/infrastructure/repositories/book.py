@@ -3,8 +3,8 @@ from typing import Any, Iterable
 from asyncpg import Record  # type: ignore
 from sqlalchemy import select,join
 
-from core.repositories.ibook import IBookRepository
-from core.domain.book import Book
+from src.core.repositories.ibook import IBookRepository
+from src.core.domain.book import Book
 from src.db import (
     book_table,
     database,

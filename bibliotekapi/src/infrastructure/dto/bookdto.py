@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
-from core.domain.book import Book
+from src.core.domain.book import Book
 
 class BookDTO(BaseModel):
     id: int

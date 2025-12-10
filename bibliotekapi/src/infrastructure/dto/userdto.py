@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
-from core.domain.user import User
+from src.core.domain.user import User
 
 
 class UserDTO(BaseModel):

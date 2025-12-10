@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Iterable
 
-from core.domain.history import History
-from infrastructure.dto.historydto import HistoryDTO
+from src.core.domain.history import History
+from src.infrastructure.dto.historydto import HistoryDTO
 
 
 class IHistoryService(ABC):

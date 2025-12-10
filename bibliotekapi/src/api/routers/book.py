@@ -31,6 +31,47 @@ async def get_book_by_id(
         raise HTTPException(status_code=404, detail="Book not found")
     return book
 
+@router.get("/{title}", response_model=BookDTO)
+@inject
+async def get_by_title(
+    title: str,
+    service: IBookService = Depends(Provide[Container.book_service]),
+):
+    book = await service.get_by_title(title)
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return book
+
+@router.get("/{author}", response_model=BookDTO)
+@inject
+async def get_by_author(
+    author: str,
+    service: IBookService = Depends(Provide[Container.book_service]),
+):
+    book = await service.get_by_author(author)
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return book
+@router.get("/{isbn}", response_model=BookDTO)
+@inject
+async def get_by_isbn(
+    isbn: str,
+    service: IBookService = Depends(Provide[Container.book_service]),
+):
+    book = await service.get_by_isbn(isbn)
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return book
+@router.get("/{category}", response_model=BookDTO)
+@inject
+async def filter_by_category(
+    category: str,
+    service: IBookService = Depends(Provide[Container.book_service]),
+):
+    book = await service.filter_by_category(category)
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return book
 
 @router.post("/", response_model=BookDTO, status_code=201)
 @inject

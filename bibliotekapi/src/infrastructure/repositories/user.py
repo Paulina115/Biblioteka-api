@@ -1,10 +1,10 @@
 from typing import Any, Iterable
 
-rom asyncpg import Record  # type: ignore
+from asyncpg import Record  # type: ignore
 from sqlalchemy import select,join
 
-from core.repositories.iuser import IUserRepository
-from core.domain.user import User
+from src.core.repositories.iuser import IUserRepository
+from src.core.domain.user import User
 
 from src.db import (
     user_table,

@@ -3,8 +3,8 @@ from typing import Any, Iterable
 from asyncpg import Record  # type: ignore
 from sqlalchemy import select,join
 
-from core.repositories.ihistory import IHistoryRepository
-from core.domain.history import History
+from src.core.repositories.ihistory import IHistoryRepository
+from src.core.domain.history import History
 from src.db import (
     history_table,
     user_table,

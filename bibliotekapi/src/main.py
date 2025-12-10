@@ -7,7 +7,7 @@ from fastapi.exception_handlers import http_exception_handler
 from src.api.routers.book import router as book_router
 from src.api.routers.history import router as history_router
 from src.api.routers.reservation import router as reservation_router
-from src.api.routers.user import router as user_router
+# from src.api.routers.user import router as user_router
 from src.container import Container
 from src.db import database, init_db
 
@@ -16,7 +16,7 @@ container.wire(modules=[
     "src.api.routers.book",
     "src.api.routers.history",
     "src.api.routers.reservation",
-    "src.api.routers.user",
+    # "src.api.routers.user",
 ])
 
 
@@ -33,7 +33,7 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(book_router, prefix="/book")
 app.include_router(history_router, prefix="/history")
 app.include_router(reservation_router, prefix="/reservation")
-app.include_router(user_router, prefix="")
+# app.include_router(user_router, prefix="")
 
 
 @app.exception_handler(HTTPException)

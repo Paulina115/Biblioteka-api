@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Iterable
 
-from core.domain.reservation import Reservation
-from infrastructure.dto.reservationdto import ReservationDTO
+from src.core.domain.reservation import Reservation
+from src.infrastructure.dto.reservationdto import ReservationDTO
 
 
 class IReservationService(ABC):

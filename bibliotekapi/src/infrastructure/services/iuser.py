@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Iterable
 
-from core.domain.user import User
-from infrastructure.dto.userdto import UserDTO
+from src.core.domain.user import User
+from src.infrastructure.dto.userdto import UserDTO
 
 
 class IUserService(ABC):

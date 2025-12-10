@@ -66,7 +66,7 @@ async def add_reservation(
 async def update_reservation(
     reservation_id: int,
     data: Reservation,
-    service: IReservationService = Depends(Provide[Container._service]),
+    service: IReservationService = Depends(Provide[Container.reservation_service]),
 ):
     updated = await service.update_reservation(reservation_id, data)
     if not updated:
@@ -74,13 +74,13 @@ async def update_reservation(
     return updated
 
 
-@router.delete("/{book_id}", status_code=204)
+@router.delete("/{reservation_id}", status_code=204)
 @inject
 async def delete_reservation(
     reservation_id: int,
-    service: IReservationService = Depends(Provide[Container.book_service]),
+    service: IReservationService = Depends(Provide[Container.reservation_service]),
 ):
-    result = await service.delete_reservation(book_id)
+    result = await service.delete_reservation(reservation_id)
     if not result:
-        raise HTTPException(status_code=404, detail="Book not found")
+        raise HTTPException(status_code=404, detail="reservation not found")
     return None

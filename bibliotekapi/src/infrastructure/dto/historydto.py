@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
-from core.domain.history import History
+from src.core.domain.history import History
 
 
 class HistoryDTO(BaseModel):

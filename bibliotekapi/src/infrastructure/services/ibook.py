@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Iterable
 
-from core.domain.book import Book
-from infrastructure.dto.bookdto import BookDTO
+from src.core.domain.book import Book
+from src.infrastructure.dto.bookdto import BookDTO
 
 
 class IBookService(ABC):
