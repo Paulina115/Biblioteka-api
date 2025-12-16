@@ -3,7 +3,6 @@ from pydantic import BaseModel, ConfigDict
 from src.core.domain.book import Book
 
 class BookDTO(BaseModel):
-    id: int
     title: str
     author: str
     description: str

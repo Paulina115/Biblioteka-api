@@ -32,7 +32,7 @@ class IBookService(ABC):
         pass
 
     @abstractmethod
-    async def add_book(self, book: Book) -> None:
+    async def add_book(self, book: Book) -> Book | None:
         pass
 
     @abstractmethod

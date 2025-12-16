@@ -42,7 +42,7 @@ class BookService(IBookService):
 
 
    
-    async def add_book(self, book: Book) -> None:
+    async def add_book(self, book: Book) -> Book:
         return await self._repository.add_book(book)
 
 

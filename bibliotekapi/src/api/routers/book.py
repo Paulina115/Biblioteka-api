@@ -11,7 +11,7 @@ from src.core.domain.book import Book
 router = APIRouter()
 
 
-@router.get("/", response_model=Iterable[BookDTO])
+@router.get("/all", response_model=Iterable[BookDTO])
 @inject
 async def get_all_books(
     service: IBookService = Depends(Provide[Container.book_service]),
@@ -73,15 +73,13 @@ async def filter_by_category(
         raise HTTPException(status_code=404, detail="Book not found")
     return book
 
-@router.post("/", response_model=BookDTO, status_code=201)
+@router.post("/create", response_model=Book, status_code=201)
 @inject
 async def create_book(
     book: Book,
     service: IBookService = Depends(Provide[Container.book_service]),
 ):
-    new_book = await service.add_book(book)
-    return new_book
-
+    return await service.add_book(Book(**book.model_dump()))
 
 @router.put("/{book_id}", response_model=BookDTO)
 @inject

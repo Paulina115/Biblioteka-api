@@ -68,14 +68,15 @@ class BookRepository(IBookRepository):
         return [BookDTO.from_record(book) for book in books]
 
 
-    async def add_book(self, book: Book) -> None:
+    async def add_book(self, book: Book) -> Book | None:
         query = (
-            book_table.insert().values(**book.model_dump())
+            book_table.insert().values(**book.__dict__)
         )
         new_book_id = await database.execute(query)
         new_book = await self.get_book_by_id(new_book_id)
 
         return Book(**dict(new_book)) if new_book else None
+
 
     async def update_book(self, id: int,data: Book) -> None:
         if self.get_book_by_id(id):

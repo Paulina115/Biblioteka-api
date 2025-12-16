@@ -1,14 +1,27 @@
-from dataclasses import dataclass
+"""Module containing book-related domain models."""
 
-@dataclass
-class Book:
-    id: int
-    title: str
-    author: str
-    description: str
-    category: str
-    isbn: str
-    publication_year: int
-    available: bool
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class BookCreate(BaseModel):
+    """Model representing book's DTO attributes."""
+    isbn: str | None = None
+    title: str = ""
+    authors: list[str] = Field(default_factory=list)
+    subject: list[str] = Field(default_factory=list)
+    description: str | None = None
+    publisher: str | None = None
+    publication_year: int | None = None
+    language: str = "pl"
+
+
+class Book(BookCreate):
+    """Model representing book's attributes in the database."""
+    id: int | None = None
+    rights:  str | None = None 
+    available: bool = True
+
+    model_config = ConfigDict(from_attributes=True, extra="ignore")
+
     
 
