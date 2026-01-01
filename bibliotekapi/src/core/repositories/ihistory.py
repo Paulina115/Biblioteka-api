@@ -1,23 +1,83 @@
-from abc import ABC, abstractmethod
-from typing import Iterable
+"""Module containing history repository implementation"""
 
-from src.core.domain.history import History
+from abc import ABC, abstractmethod
+
+from src.core.domain.history import HistoryCreate, History
 
 
 class IHistoryRepository(ABC):
+    """An abstract class representing protocol of history repository."""
 
     @abstractmethod
-    async def get_all_history(self) -> Iterable[History]:
-        pass
+    async def get_all_history(self) -> list[History]:
+        """The abstract getting a all history from the data storage.
+        
+        Returns:
+            list[History]: The collection of all history data.
+        """
 
     @abstractmethod
-    async def get_history_by_user(self, user_id: int) -> Iterable[History]:
-        pass
+    async def get_history_by_id(self, history_id: int) -> History | None:
+        """The abstract getting a single history record from the data storage.
+        
+        Args:
+            history_id (int): The id of the history.
+
+        Returns:
+            History | None: The history data if exists.
+        """
 
     @abstractmethod
-    async def get_history_by_book(self, book_id: int) -> Iterable[History]:
-        pass
+    async def get_history_by_user(self, user_id: int) -> list[History]:
+       """The abstract getting a history for a given user from the data storage.
+        
+        Args:
+            user_id (int): The id of the user.
+
+        Returns:
+            List[History]: The collection of history data for a given user.
+        """
 
     @abstractmethod
-    async def update_history(self, id: int, data: History) -> None:
-        pass
+    async def add_history(self, data: HistoryCreate) -> History | None:
+        """The abstract adding new history record to the data storage.
+        
+        Args:
+            data (HistoryCreate): The attributes of the history.
+
+        Returns:
+            History | None: The newly created history record.
+        """
+
+    @abstractmethod
+    async def update_history(self, history_id: int, data: HistoryCreate) -> History | None:
+        """The abstarct updating history data in the data storage.
+        
+        Args:
+            history_id (int): The history id.
+            data (HistoryCreate): The attributes of the history record.
+
+        Returns:
+            History | None: The updated history record.
+        """
+
+    @abstractmethod
+    async def delete_history(self, history_id: int) -> bool:
+       """The abstarct removing a single history record from the data storage.
+
+        Args:
+            history_id (int): The history id.
+
+        Returns:
+            bool: Success of the operation.
+        """
+    @abstractmethod
+    async def delete_history_by_user(self, user_id: int) -> bool:
+       """The abstarct removing all history records for a user from the data storage.
+
+        Args:
+            user_id (int): The user id.
+
+        Returns:
+            bool: Success of the operation.
+        """

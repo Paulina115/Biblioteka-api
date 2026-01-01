@@ -1,15 +1,19 @@
-from pydantic import BaseModel, ConfigDict
+"""A module containing user DTO model."""
 
-from src.core.domain.user import User
+from pydantic import UUID4, BaseModel, EmailStr, ConfigDict
+
+from src.core.domain.user import UserRole
 
 
 class UserDTO(BaseModel):
-    id: int
-    name: str
-    email: str
+    """A DTO model for user."""
+    id: UUID4
+    username: str
+    email: EmailStr
+    membership_number: str | None = None
+    role: UserRole.user
 
     model_config = ConfigDict(
-        from_atributes=True,
+        from_attributes=True,
         extra="ignore",
     )
-    

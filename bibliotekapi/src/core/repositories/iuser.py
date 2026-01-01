@@ -1,28 +1,75 @@
-from abc import ABC, abstractmethod
-from typing import Iterable
+"""A repository for user entity."""
 
-from src.core.domain.user import User
+from abc import ABC, abstractmethod
+
+from pydantic import UUID4, EmailStr
+
+from src.core.domain.user import User, UserCreate
 
 
 class IUserRepository(ABC):
+    """An abstarct repository class for user."""
 
     @abstractmethod
-    async def get_all_users(self) -> Iterable[User]:
-        pass
+    async def get_all_users(self) -> list[User]:
+       """The abstract getting all users from the data storage.
+        
+        Returns:
+            list[User]: The collection of the all users.
+        """
 
     @abstractmethod
-    async def get_user_by_id(self, id: int) -> User:
-        pass
+    async def get_user_by_uuid(self, user_id: UUID4) -> User | None:
+        """The abstract getting a user from the data storage.
+
+        Args:
+            user_id (UUID4): The id of the user.
+        
+        Returns:
+            User | None: The user data if exists.
+        """
 
     @abstractmethod
-    async def get_user_by_email(self, email: str) -> User:
-        pass
+    async def get_user_by_email(self, email: EmailStr) -> User | None:
+        """The abstract getting a user by email from the data storage.
+
+        Args:
+            email (EmailStr): The email of the user.
+        
+        Returns:
+            User | None: The user data if exists.
+        """
 
     @abstractmethod
-    async def create_user(self, data: User) -> None:
-        pass
+    async def add_user(self, data: UserCreate) -> User | None:
+        """The abstract adding new user to the data storage.
+        
+        Args:
+            data (UserCreate): The attributes of the user.
+        Returns:
+            User | None: The newly created user.
+        """
 
     @abstractmethod
-    async def delete_user(self, id: int) -> None:
-        pass
+    async def update_user(self, user_id: UUID4, data: UserCreate) -> User | None:
+        """The abstarct updating user data in the data storage.
+        
+        Args:
+            user_id (UUID4): The user id.
+            data (UserCreate): The attributes of the user.
+
+        Returns:
+            User | None: The updated user.
+        """
+
+    @abstractmethod
+    async def delete_user(self, user_id: UUID4) -> bool:
+        """The abstarct removing user from the data storage.
+
+        Args:
+            user_id (UUID4): The user id.
+
+        Returns:
+            bool: Success of the operation.
+        """
     

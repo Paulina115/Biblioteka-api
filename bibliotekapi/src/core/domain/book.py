@@ -18,8 +18,6 @@ class BookCreate(BaseModel):
 class Book(BookCreate):
     """Model representing book's attributes in the database."""
     id: int | None = None
-    rights:  str | None = None 
-    available: bool = True
 
     model_config = ConfigDict(from_attributes=True, extra="ignore")
 
