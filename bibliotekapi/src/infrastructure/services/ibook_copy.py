@@ -1,15 +1,16 @@
-"""Module containing book copy repository abstractions"""
+"""Module containing book copy service abstractions."""
 
 from abc import ABC, abstractmethod
 
-from src.core.domain.book_copy import BookCopyCreate, BookCopy, BookCopyStatus
+from src.core.domain.book_copy import BookCopy, BookCopyCreate, BookCopyStatus
 
 
-class IBookCopyRepository(ABC):
-    """An abstract class representing protocol of book copy  repository"""
+class IBookCopyService(ABC):
+    """A abstarct class representing book copy service"""
+
     @abstractmethod
     async def count_available_copies(self, book_id: int) -> int:
-        """the abstract counting how many copies of the book is available.
+        """the abstract checking if and how many copies of the book is available.
 
             Args:
                 book_id (int): The id of the book.
@@ -17,10 +18,10 @@ class IBookCopyRepository(ABC):
             Returns:
                 int: The number of available copies of the book.
         """
-        
+
     @abstractmethod
     async def get_book_copy_by_id(self, copy_id: int) -> BookCopy | None:
-        """The abstract getting a book copy from the data storage.
+        """The abstract getting a book copy from the repository. (Intended for librarian).
 
         Args:
             copy_id (int): The id of the book copy.
@@ -30,13 +31,13 @@ class IBookCopyRepository(ABC):
         """
 
     @abstractmethod
-    async def get_copies_by_book(self, book_id: int, status: BookCopyStatus | None = None) -> list[BookCopy]:
-        """The abstract getting book copies of a specific book from the data storage.
+    async def get_copies_by_book(self, book_id: int, status: BookCopyStatus | None = None, ) -> list[BookCopy]:
+        """The abstract getting book copies of a specific book from the repository. (Intended for librarian).
             Optionally filter by status.
 
         Args:
-            book_id (int): The id of the book to retrive copies for.
-            status (BookCopy | None): status of the copy e.g available.
+            book_id (int): The id of the book to retrieve copies for.
+            status (BookCopyStatus | None): status of the copy e.g available.
 
         Returns:
             list[BookCopy]: The collection of the all copies of a specific book.
@@ -44,7 +45,7 @@ class IBookCopyRepository(ABC):
 
     @abstractmethod
     async def add_book_copy(self, data: BookCopyCreate) -> BookCopy | None:
-        """The abstract adding new book copy to the data storage.
+        """The abstract adding new book copy to the repository. (Intended for librarian).
             
         Args:
             data (BookCopyCreate): The attributes of the book copy.
@@ -54,7 +55,7 @@ class IBookCopyRepository(ABC):
 
     @abstractmethod
     async def update_book_copy(self, copy_id: int, data: BookCopyCreate) -> BookCopy | None:
-        """The abstarct updating book copy  data in the data storage.
+        """The abstract updating book copy  data in the repository.(Intended for librarian).
         
         Args:
             copy_id (int): The book copy  id.
@@ -65,13 +66,12 @@ class IBookCopyRepository(ABC):
         """
 
     @abstractmethod
-    async def delete_book_copy(self, copy_id: int) -> bool:
-        """The abstarct removing book copy from the data storage.
+    async def remove_book_copy(self, copy_id: int) -> bool:
+        """The abstract removing book copy from the repository. (Intended for librarian).
 
         Args:
-            copy_id (int): The boo copy id.
+            copy_id (int): The book copy id.
 
         Returns:
             bool: Success of the operation.
         """
-

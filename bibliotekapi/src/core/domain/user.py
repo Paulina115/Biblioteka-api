@@ -22,14 +22,14 @@ class UserCreate(BaseModel):
     username: str
     email: EmailStr
     password: str 
-    membership_number: str | None = None
     role: UserRole = UserRole.user
 
 
 class User(UserCreate):
     """User model representing a user in the database."""
-    id: UUID = Field(default_factory=uuid4)
+    user_id: UUID = Field(default_factory=uuid4)
 
     model_config = ConfigDict(from_attributes=True, extra="ignore")
+
 
 

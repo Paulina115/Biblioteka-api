@@ -41,6 +41,17 @@ class IUserRepository(ABC):
         """
 
     @abstractmethod
+    async def get_user_by_username(self, username: str) -> User | None:
+        """The abstract getting a user by username from the data storage.
+
+        Args:
+            username (str): The username of the user.
+        
+        Returns:
+            User | None: The user data if exists.
+        """
+
+    @abstractmethod
     async def add_user(self, data: UserCreate) -> User | None:
         """The abstract adding new user to the data storage.
         

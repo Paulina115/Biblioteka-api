@@ -2,15 +2,19 @@
 
 from abc import ABC, abstractmethod
 
-from src.core.domain.history import HistoryCreate, History
+from src.core.domain.history import HistoryCreate, History, HistoryStatus
 
 
 class IHistoryRepository(ABC):
     """An abstract class representing protocol of history repository."""
 
     @abstractmethod
-    async def get_all_history(self) -> list[History]:
+    async def get_all_history(self, status: HistoryStatus | None = None) -> list[History]:
         """The abstract getting a all history from the data storage.
+            Optionally filter by status
+        
+        Args:
+            status (HistoryStatus | None): History status.
         
         Returns:
             list[History]: The collection of all history data.
@@ -28,11 +32,12 @@ class IHistoryRepository(ABC):
         """
 
     @abstractmethod
-    async def get_history_by_user(self, user_id: int) -> list[History]:
+    async def get_history_by_user(self, user_id: int, status: HistoryStatus | None = None) -> list[History]:
        """The abstract getting a history for a given user from the data storage.
-        
+            Optionally filter by status.
         Args:
             user_id (int): The id of the user.
+            status (HistoryStatus): The history status.
 
         Returns:
             List[History]: The collection of history data for a given user.

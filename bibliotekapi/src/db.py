@@ -1,85 +1,128 @@
-import asyncio
+"""A module providing database acces"""
 
-import databases
-import sqlalchemy
+from __future__ import annotations
+
+import asyncio
+import uuid
+from datetime import datetime
+from typing import List
+from enum import Enum as sEnum
+
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.exc import OperationalError, DatabaseError
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.ext.mutable import MutableList
-from asyncpg.exceptions import (    # type: ignore
-    CannotConnectNowError,
-    ConnectionDoesNotExistError,
+from sqlalchemy import ForeignKey, String, Enum, ARRAY
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, AsyncAttrs, create_async_engine
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    mapped_column,
+    relationship,
 )
+from sqlalchemy.ext.mutable import MutableList
+from sqlalchemy.exc import OperationalError, DatabaseError
+from asyncpg.exceptions import CannotConnectNowError, ConnectionDoesNotExistError
 
 from src.config import config
 
-metadata = sqlalchemy.MetaData()
+class BookCopyStatus(sEnum):
+    available = "available"
+    borrowed = "borrowed"
 
-book_table = sqlalchemy.Table(
-    "books",
-    metadata,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("title", sqlalchemy.String,nullable=False),
-    sqlalchemy.Column("author", sqlalchemy.String, nullable=False),
-    sqlalchemy.Column("description", sqlalchemy.String),
-    sqlalchemy.Column("category", sqlalchemy.String),
-    sqlalchemy.Column("isbn", sqlalchemy.String, unique=True),
-    sqlalchemy.Column("publication_year", sqlalchemy.Integer),
-    sqlalchemy.Column("available", sqlalchemy.Boolean, default=True),
+class HistoryStatus(sEnum):
+    borrowed = "borrowed"
+    returned = "returned"
+    overdue = "overdue"
+
+class ReservationStatus(sEnum):
+    active = "active"
+    canceled = "canceled"
+    expired = "expired"
+
+class UserRole(sEnum):
+    user = "user"
+    librarian = "librarian"
+
+class Base(AsyncAttrs, DeclarativeBase):
+    pass
+
+class Book(Base):
+    __tablename__ = "book"
+
+    book_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    isbn: Mapped[str | None] = mapped_column(unique=True)
+    title: Mapped[str] = mapped_column(nullable=False)
+    authors: Mapped[List[str]] = mapped_column(MutableList.as_mutable(ARRAY(String)),nullable=False)
+    subject: Mapped[List[str]] = mapped_column(MutableList.as_mutable(ARRAY(String)),nullable=False)
+    description: Mapped[str | None]
+    publisher: Mapped[str | None] 
+    publication_year: Mapped[int | None]
+    language: Mapped[str] = mapped_column(default="pl")
+
+    copies: Mapped[List[BookCopy]] = relationship("BookCopy", back_populates="book", cascade="all, delete-orphan")
+    histories: Mapped[List[History]] = relationship("History", back_populates="book", cascade="all, delete-orphan")
+    reservations: Mapped[List[Reservation]] = relationship("Reservation", back_populates="book", cascade="all, delete-orphan")
+
+class BookCopy(Base):
+    __tablename__ = "book_copy"
+
+    copy_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    book_id: Mapped[int] = mapped_column(ForeignKey("book.book_id"))
+    status: Mapped[BookCopyStatus] = mapped_column(Enum(BookCopyStatus), default=BookCopyStatus.available)
+    location: Mapped[str | None]
+
+    book: Mapped[Book] = relationship("Book", back_populates="copies")
+
+class History(Base):
+    __tablename__ = "history"
+
+    history_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    book_id: Mapped[int] = mapped_column(ForeignKey("book.book_id"))
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("user.user_id"))
+    borrowed_date: Mapped[datetime] = mapped_column(nullable=False)
+    return_date: Mapped[datetime | None]
+    due_date: Mapped[datetime] = mapped_column(nullable=False)
+    status: Mapped[HistoryStatus] = mapped_column(Enum(HistoryStatus), default=HistoryStatus.borrowed)
+
+    book: Mapped[Book] = relationship("Book", back_populates="histories")
+    user: Mapped[User] = relationship("User", back_populates="histories")
+
+class Reservation(Base):
+    __tablename__ = "reservation"
+
+    reservation_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    book_id: Mapped[int] = mapped_column(ForeignKey("book.book_id"))
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("user.user_id"))
+    reservation_date: Mapped[datetime] = mapped_column(nullable=False)
+    expiration_date: Mapped[datetime] = mapped_column(nullable=False)
+    status: Mapped[ReservationStatus | None] = mapped_column(Enum(ReservationStatus), default=ReservationStatus.active)
     
-    )
+    book: Mapped[Book] = relationship("Book", back_populates="reservations")
+    user: Mapped[User] = relationship("User", back_populates="reservations")
 
-history_table = sqlalchemy.Table(
-    "history",
-    metadata,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("borrowed_date", sqlalchemy.DateTime),
-    sqlalchemy.Column("due_date", sqlalchemy.DateTime),
-    sqlalchemy.Column("return_date", sqlalchemy.DateTime),
-    sqlalchemy.Column("status", sqlalchemy.String),
-    sqlalchemy.Column("user_id", sqlalchemy.ForeignKey("books.id"), nullable=False,),
-    sqlalchemy.Column("book_id", sqlalchemy.ForeignKey("books.id"),nullable=False,),
+class User(Base):
+    __tablename__ = "user"
 
-)
-
-reservation_table = sqlalchemy.Table(
-    "reservation",
-    metadata,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("reservation_date", sqlalchemy.DateTime),
-    sqlalchemy.Column("expiration_date", sqlalchemy.DateTime),
-    sqlalchemy.Column("status", sqlalchemy.String),
-    sqlalchemy.Column("user_id", sqlalchemy.ForeignKey("users.id"), nullable=False,),
-    sqlalchemy.Column("book_id", sqlalchemy.ForeignKey("books.id"),nullable=False,),
-)
-
-user_table = sqlalchemy.Table(
-    "users",
-    metadata,
-    sqlalchemy.Column(
-        "id",
-        UUID(as_uuid=True),
+    user_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True),
         primary_key=True,
-        server_default=sqlalchemy.text("gen_random_uuid()"),
-    ),
-    sqlalchemy.Column("email", sqlalchemy.String, unique=True),
-    sqlalchemy.Column("password", sqlalchemy.String),
-)
+        default=uuid.uuid4)
+    username: Mapped[str] = mapped_column(nullable=False)
+    email: Mapped[str] = mapped_column(nullable=False, unique=True)
+    password: Mapped[str] = mapped_column(nullable=False) 
+    role: Mapped[UserRole] = mapped_column(Enum(UserRole), default=UserRole.user)
+    
+    histories: Mapped[List[History]] = relationship("History", back_populates="user", cascade="all, delete-orphan")
+    reservations: Mapped[List[Reservation]] = relationship("Reservation", back_populates="user", cascade="all, delete-orphan")
 
-db_uri = (
+
+db_url = (
     f"postgresql+asyncpg://{config.DB_USER}:{config.DB_PASSWORD}"
     f"@{config.DB_HOST}/{config.DB_NAME}"
+    )
+engine = create_async_engine(db_url, echo=True, pool_pre_ping=True,)
+# Create async session factory
+async_session_factory = async_sessionmaker(
+    engine,
+    expire_on_commit=False,
 )
-
-engine = create_async_engine(
-    db_uri,
-    echo=True,
-    future=True,
-    pool_pre_ping=True,
-)
-
-database = databases.Database(db_uri)
-
 
 async def init_db(retries: int = 5, delay: int = 5) -> None:
     """Function initializing the DB.
@@ -92,15 +135,18 @@ async def init_db(retries: int = 5, delay: int = 5) -> None:
     for attempt in range(retries):
         try:
             async with engine.begin() as conn:
-                await conn.run_sync(metadata.create_all)
+                await conn.run_sync(Base.metadata.create_all)
             return
-        except (
+        except(
             OperationalError,
             DatabaseError,
             CannotConnectNowError,
-            ConnectionDoesNotExistError,
+            ConnectionDoesNotExistError
         ) as e:
             print(f"Attempt {attempt + 1} failed: {e}")
             await asyncio.sleep(delay)
-
     raise ConnectionError("Could not connect to DB after several retries.")
+
+
+
+

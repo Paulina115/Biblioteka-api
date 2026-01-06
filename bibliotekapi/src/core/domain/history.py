@@ -22,16 +22,16 @@ class HistoryStatus(str, Enum):
 class HistoryCreate(BaseModel):
     """Model representing history's DTO attributes."""
     user_id: int
-    book_id: int
+    book_copy_id: int
 
 
 class History(HistoryCreate):
     """Model representing history's attributes in the database."""
-    id: int | None = None
+    history_id: int | None = None
     borrowed_date: datetime
     due_date: datetime
     return_date: datetime | None
-    status: HistoryStatus
+    status: HistoryStatus = HistoryStatus.borrowed
 
     model_config = ConfigDict(from_attributes=True, extra="ignore")
     

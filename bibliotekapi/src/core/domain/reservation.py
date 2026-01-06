@@ -26,10 +26,11 @@ class ReservationCreate(BaseModel):
 
 
 class Reservation(ReservationCreate):
-    """Model representing history's attributes in the database."""
-    id: int | None = None
+    """Model representing reservation's attributes in the database."""
+    reservation_id: int | None = None
     reservation_date: datetime
     expiration_date: datetime
-    status: ReservationStatus
+    status: ReservationStatus = ReservationStatus.active
 
     model_config = ConfigDict(from_attributes=True, extra="ignore")
+
