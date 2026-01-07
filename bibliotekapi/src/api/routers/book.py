@@ -6,6 +6,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from src.container import Container
 from src.infrastructure.services.ibook import IBookService
 from src.core.domain.book import Book, BookCreate
+from src.infrastructure.dto.userdto import UserDTO
+from src.infrastructure.auth.auth import librarian_required
 
 router = APIRouter()
 
@@ -32,12 +34,14 @@ async def get_all_books(
 async def get_book_by_id(
     book_id: int,
     service: IBookService = Depends(Provide[Container.book_service]),
+    current_user: UserDTO = Depends(librarian_required)
 ) -> dict:
     """An endpoint for getting book by id.
     
     Args:
         book_id (int): The book id.
         service (IBookService): The injected service dependency.
+        current_user (UserDTO): The injected user authentication dependency.
 
     Returns:
         dict: The book attributes.
@@ -147,12 +151,14 @@ async def filter_by_category(
 async def create_book(
     data: BookCreate,
     service: IBookService = Depends(Provide[Container.book_service]),
+    current_user: UserDTO = Depends(librarian_required)
 ) -> dict :
      """An endpoint for creating new book.
     
     Args:
         data (BookCreate): The book data.
         service (IBookService): The injected service dependency.
+        current_user (UserDTO): The injected user authentication dependency.
 
     Returns:
         dict: The created book attributes.
@@ -165,12 +171,15 @@ async def update_book(
     book_id: int,
     data: BookCreate,
     service: IBookService = Depends(Provide[Container.book_service]),
+    current_user: UserDTO = Depends(librarian_required)
 ) -> dict :
      """An endpoint for updating book.
     
     Args:
-        data (BookCreate): data for updating the book.
+        book_id (int): The book id.
+        data (BookCreate): Data for updating the book.
         service (IBookService): The injected service dependency.
+        current_user (UserDTO): The injected user authentication dependency.
 
     Returns:
         dict: The updated book attributes.
@@ -186,12 +195,14 @@ async def update_book(
 async def delete_book(
     book_id: int,
     service: IBookService = Depends(Provide[Container.book_service]),
+    current_user: UserDTO = Depends(librarian_required)
 ) -> None:
      """An endpoint for deleting book.
     
     Args:
         book_id (int): The book id.
         service (IBookService): The injected service dependency.
+        current_user (UserDTO): The injected user authentication dependency.
     """
      result = await service.remove_book(book_id)
      if not result:

@@ -9,9 +9,11 @@ class BookCopyStatus(str, Enum):
     
         Attributes:
             available: The copy is available and can be borrowed.
+            reserved: The copy is currently reserved.
             borrowed: The copy is currently borrowed.
     """
     available = "available"
+    reserved = "reserved"
     borrowed = "borrowed"
 
 
@@ -19,12 +21,11 @@ class BookCopyCreate(BaseModel):
     "Model representing book copy's DTO attributes"
     book_id: int
     location: str | None = None
-
+    status: BookCopyStatus = BookCopyStatus.available
 
 class BookCopy(BookCopyCreate):
     "Model representing book copy's attributes in database"
     copy_id: int | None = None
-    status: BookCopyStatus = BookCopyStatus.available
-
+    
     model_config = ConfigDict(from_attributes=True, extra="ignore")
 

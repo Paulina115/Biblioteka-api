@@ -10,6 +10,7 @@ from src.db import Book as BookORM, BookCopy as BookCopyORM, async_session_facto
 
 class BookRepository(IBookRepository):
     """A class implementing the book repository."""
+    
     def __init__(self, sessionmaker = async_session_factory):
         self._sessionmaker = sessionmaker
     
@@ -185,6 +186,7 @@ class BookRepository(IBookRepository):
 
         Args:
             book_id (int): The ID of the book.
+            session (AsyncSession): session for query.
 
         Returns:
             BookORM | None: Book record if exists.

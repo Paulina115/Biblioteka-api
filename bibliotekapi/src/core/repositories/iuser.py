@@ -1,8 +1,7 @@
 """A repository for user entity."""
 
 from abc import ABC, abstractmethod
-
-from pydantic import UUID4, EmailStr
+from uuid import UUID
 
 from src.core.domain.user import User, UserCreate
 
@@ -19,36 +18,36 @@ class IUserRepository(ABC):
         """
 
     @abstractmethod
-    async def get_user_by_uuid(self, user_id: UUID4) -> User | None:
+    async def get_user_by_uuid(self, user_id: UUID) -> User | None:
         """The abstract getting a user from the data storage.
 
         Args:
-            user_id (UUID4): The id of the user.
+            user_id (UUID): The id of the user.
         
         Returns:
             User | None: The user data if exists.
         """
 
     @abstractmethod
-    async def get_user_by_email(self, email: EmailStr) -> User | None:
+    async def get_user_by_email(self, email: str) -> User | None:
         """The abstract getting a user by email from the data storage.
 
         Args:
-            email (EmailStr): The email of the user.
+            email (str): The email of the user.
         
         Returns:
             User | None: The user data if exists.
         """
 
     @abstractmethod
-    async def get_user_by_username(self, username: str) -> User | None:
+    async def get_user_by_username(self, username: str) -> list[User]:
         """The abstract getting a user by username from the data storage.
 
         Args:
             username (str): The username of the user.
         
         Returns:
-            User | None: The user data if exists.
+            list[User]: The collection of users data.
         """
 
     @abstractmethod
@@ -62,11 +61,11 @@ class IUserRepository(ABC):
         """
 
     @abstractmethod
-    async def update_user(self, user_id: UUID4, data: UserCreate) -> User | None:
+    async def update_user(self, user_id: UUID, data: UserCreate) -> User | None:
         """The abstarct updating user data in the data storage.
         
         Args:
-            user_id (UUID4): The user id.
+            user_id (UUID): The user id.
             data (UserCreate): The attributes of the user.
 
         Returns:
@@ -74,11 +73,11 @@ class IUserRepository(ABC):
         """
 
     @abstractmethod
-    async def delete_user(self, user_id: UUID4) -> bool:
+    async def delete_user(self, user_id: UUID) -> bool:
         """The abstarct removing user from the data storage.
 
         Args:
-            user_id (UUID4): The user id.
+            user_id (UUID): The user id.
 
         Returns:
             bool: Success of the operation.

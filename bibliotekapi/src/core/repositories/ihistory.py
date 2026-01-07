@@ -1,6 +1,7 @@
 """Module containing history repository implementation"""
 
 from abc import ABC, abstractmethod
+from uuid import UUID
 
 from src.core.domain.history import HistoryCreate, History, HistoryStatus
 
@@ -32,15 +33,26 @@ class IHistoryRepository(ABC):
         """
 
     @abstractmethod
-    async def get_history_by_user(self, user_id: int, status: HistoryStatus | None = None) -> list[History]:
+    async def get_history_by_user(self, user_id: UUID, status: HistoryStatus | None = None) -> list[History]:
        """The abstract getting a history for a given user from the data storage.
             Optionally filter by status.
         Args:
-            user_id (int): The id of the user.
+            user_id (UUID): The id of the user.
             status (HistoryStatus): The history status.
 
         Returns:
             List[History]: The collection of history data for a given user.
+        """
+    
+    @abstractmethod
+    async def get_history_by_user_and_copy(self, user_id: UUID, copy_id: int) -> History:
+       """The abstract getting a history for a given user and book copy from the data storage.
+        Args:
+            user_id (UUID): The id of the user.
+            copy_id (int): The book copy id.
+
+        Returns:
+            History: The history data for a given user and book copy if exist.
         """
 
     @abstractmethod

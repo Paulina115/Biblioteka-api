@@ -6,6 +6,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from src.container import Container
 from src.infrastructure.services.ibook_copy import IBookCopyService
 from src.core.domain.book_copy import BookCopy, BookCopyCreate, BookCopyStatus
+from src.infrastructure.dto.userdto import UserDTO
+from src.infrastructure.auth.auth import librarian_required
 
 router = APIRouter()
 
@@ -14,12 +16,14 @@ router = APIRouter()
 async def get_book_copies_by_id(
     copy_id: int,
     service: IBookCopyService = Depends(Provide[Container.book_copy_service]),
+    current_user: UserDTO = Depends(librarian_required)
 ) -> dict:
     """An endpoint for getting book copies by id.
     
     Args:
         copy_id: id of the book copy.
         service (IBookCopyService): The injected service dependency.
+        current_user (UserDTO): The injected user authentication dependency.
 
     Returns:
         dict: The book copy attributes.
@@ -34,13 +38,15 @@ async def get_book_copies_by_id(
 async def get_copies_by_book(
     book_id: int,
     status: BookCopyStatus,
-    service: IBookCopyService = Depends(Provide[Container.book_copy_service])
+    service: IBookCopyService = Depends(Provide[Container.book_copy_service]),
+    current_user: UserDTO = Depends(librarian_required)
 ) -> list:
     """An endpoint for getting book copies of a specific book.
     
     Args:
         book_id: id of the book to retrive copies for.
         service (IBookCopyService): The injected service dependency.
+        current_user (UserDTO): The injected user authentication dependency.
 
     Returns:
         list: The book copy attributes collection.
@@ -69,13 +75,15 @@ async def count_available_copies(
 @inject
 async def add_book_copy(
     data: BookCopyCreate,
-    service: IBookCopyService = Depends(Provide[Container.book_copy_service])
+    service: IBookCopyService = Depends(Provide[Container.book_copy_service]),
+    current_user: UserDTO = Depends(librarian_required)
 ) -> dict:
     """An endpoint for adding book copies.
     
     Args:
         data (BookCopyCreate): The book copy data.
         service (IBookCopyService): The injected service dependency.
+        current_user (UserDTO): The injected user authentication dependency.
 
     Returns:
         dict : The book copy attributes.
@@ -87,7 +95,8 @@ async def add_book_copy(
 async def update_copy(
     copy_id: int,
     data: BookCopyCreate,
-    service: IBookCopyService = Depends(Provide[Container.book_copy_service])
+    service: IBookCopyService = Depends(Provide[Container.book_copy_service]),
+    current_user: UserDTO = Depends(librarian_required)
 ) -> dict:
     """An endpoint for updating book copies.
     
@@ -95,6 +104,7 @@ async def update_copy(
         copy_id (int): Id of the book copy.
         data (BookCopyCreate): The book copy data.
         service (IBookCopyService): The injected service dependency.
+        current_user (UserDTO): The injected user authentication dependency.
 
     Returns:
         dict: The book copy.
@@ -108,13 +118,15 @@ async def update_copy(
 @inject
 async def delete_book_copy(
     copy_id: int,
-    service: IBookCopyService = Depends(Provide[Container.book_copy_service])
+    service: IBookCopyService = Depends(Provide[Container.book_copy_service]),
+    current_user: UserDTO = Depends(librarian_required)
 ) -> None:
     """An endpoint for removing book copies.
     
     Args:
         copy_id: id of the book copy.
         service (IBookCopyService): The injected service dependency.
+        current_user (UserDTO): The injected user authentication dependency.
     """
     result = await service.remove_book_copy(copy_id)
     if result:

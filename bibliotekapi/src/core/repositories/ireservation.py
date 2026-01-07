@@ -1,8 +1,9 @@
 """Module containing reservation repository implementation"""
 
 from abc import ABC, abstractmethod
+from uuid import UUID
 
-from src.core.domain.reservation import ReservationCreate, Reservation
+from src.core.domain.reservation import ReservationCreate, Reservation, ReservationStatus
 
 
 class IReservationRepository(ABC):
@@ -28,11 +29,13 @@ class IReservationRepository(ABC):
         """
 
     @abstractmethod
-    async def get_reservation_by_user(self, user_id: int) -> list[Reservation]:
+    async def get_reservation_by_user(self, user_id: UUID, status: ReservationStatus | None = None) -> list[Reservation]:
        """The abstract getting a reservation for a given user from the data storage.
+       Optionally filters by status.
         
         Args:
-            user_id (int): The id of the user.
+            user_id (UUID): The id of the user.
+            status (ResrvationStatus | None): The reservation status.
 
         Returns:
             List[Reservation]: The collection of reservation data for a given user.
@@ -72,11 +75,11 @@ class IReservationRepository(ABC):
             bool: Success of the operation.
         """
     @abstractmethod
-    async def delete_reservation_by_user(self, user_id: int) -> bool:
+    async def delete_reservation_by_user(self, user_id: UUID) -> bool:
        """The abstarct removing reservation for a user from the data storage.
 
         Args:
-            user_id (int): The user id.
+            user_id (UUID): The user id.
 
         Returns:
             bool: Success of the operation.

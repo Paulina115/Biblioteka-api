@@ -43,14 +43,14 @@ class IUserService(ABC):
         """
 
     @abstractmethod
-    async def get_user_by_username(self, username: str) -> UserDTO | None:
+    async def get_user_by_username(self, username: str) -> UserDTO:
         """The abstract getting a user by username from the repository.
 
         Args:
             username (str): The username of the user.
         
         Returns:
-            UserDTO | None: The user data if exists.
+            list[UserDTO]: The collection of user data.
         """
 
     @abstractmethod
@@ -98,14 +98,5 @@ class IUserService(ABC):
             TokenDTO | None: The token details.
         """
 
-    @abstractmethod
-    async def remove_user(self, user_id: UUID4) -> bool:
-        """The abstarct removing user from the repository.
-
-        Args:
-            user_id (UUID4): The user id.
-
-        Returns:
-            bool: Success of the operation.
-        """
+    
     

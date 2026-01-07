@@ -10,6 +10,7 @@ from src.db import BookCopy as BookCopyORM, async_session_factory
 
 class BookCopyRepository(IBookCopyRepository):
     """A class implementing the book copy repository."""
+    
     def __init__(self, sessionmaker = async_session_factory):
         self._sessionmaker = sessionmaker
 

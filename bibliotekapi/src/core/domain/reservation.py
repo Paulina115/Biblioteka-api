@@ -1,8 +1,8 @@
 """Module containing reservation-related domain models."""
 
 from enum import Enum
-from pydantic import BaseModel, ConfigDict
-from datetime import datetime
+from pydantic import BaseModel, ConfigDict, Field
+from datetime import datetime, timedelta
 
 
 class ReservationStatus(str, Enum):
@@ -12,25 +12,33 @@ class ReservationStatus(str, Enum):
     Attributes:
         active: The reservation is currently active.
         canceled: The reservation has been canceled by the user or system.
-        expired: The reservation was not claimed in time and has expired.
+        collected: The reserved book was collected.
     """
     active = "active"
     canceled = "canceled"
-    expired = "expired"
+    collected = "collected"
 
 
 class ReservationCreate(BaseModel):
     """Model representing reservation's DTO attributes."""
     user_id: int
-    book_id: int
+    copy_id: int
+    status: ReservationStatus = ReservationStatus.active
+
 
 
 class Reservation(ReservationCreate):
     """Model representing reservation's attributes in the database."""
     reservation_id: int | None = None
-    reservation_date: datetime
-    expiration_date: datetime
-    status: ReservationStatus = ReservationStatus.active
-
+    reservation_date: datetime = Field(default_factory=lambda: datetime.now())
+    expiration_date: datetime = Field(default_factory=lambda: datetime.now() + timedelta(days=3))
+    
     model_config = ConfigDict(from_attributes=True, extra="ignore")
 
+    @property
+    def is_expired(self) -> bool:
+        """Method returns True if reservation is active and past expiration date"""
+        return (
+            self.status == ReservationStatus.active
+            and self.expiration_date < datetime.now()
+        )

@@ -10,6 +10,7 @@ from src.db import History as HistoryORM, async_session_factory
 
 class HistoryRepository(IHistoryRepository):
     """A class implementing the history repository"""
+    
     def __init__(self, sessionmaker = async_session_factory):
         self._sessionmaker = sessionmaker
         
@@ -41,12 +42,12 @@ class HistoryRepository(IHistoryRepository):
             history = await self._get_by_id(history_id, session)
             return HistoryDomain.model_validate(history) if history else None
 
-    async def get_history_by_user(self, user_id: int, status: HistoryStatus | None = None) -> list[HistoryDomain]:
+    async def get_history_by_user(self, user_id: UUID, status: HistoryStatus | None = None) -> list[HistoryDomain]:
        """The method getting a history for a given user from the data storage.
             Optionally filter by status.
         
         Args:
-            user_id (int): The id of the user.
+            user_id (UUID): The id of the user.
             status (History status): The history status.
 
         Returns:
@@ -58,6 +59,23 @@ class HistoryRepository(IHistoryRepository):
                 stmt = stmt.where(HistoryORM.status==status)
            history = (await session.scalars(stmt)).all()
            return [HistoryDomain.model_validate(h) for h in history]
+
+    async def get_history_by_user_and_copy(self, user_id: UUID, copy_id: int) -> HistoryDomain | None:
+       """The method getting a history for a given user and book copy from the data storage.
+        Args:
+            user_id (UUID): The id of the user.
+            copy_id (int): The id of the book copy.
+
+        Returns:
+            HistoryDomain: The history data for a given user and book copy if exist.
+        """
+       async with self._sessionmaker() as session:
+           stmt = ( select(HistoryORM)
+                   .where(HistoryORM.user_id == user_id,
+                          HistoryORM.copy_id ==  copy_id)
+           )
+           history = (await session.scalars(stmt)).first()
+           return HistoryDomain.model_validate(history) if history else None
 
     async def add_history(self, data: HistoryCreate) -> HistoryDomain | None:
         """The method adding new history record to the data storage.
@@ -131,6 +149,7 @@ class HistoryRepository(IHistoryRepository):
 
         Args:
             history_id (int): The ID of the history.
+            session (AsyncSession): session for query.
 
         Returns:
             HistoryORM | None: History record if exists.

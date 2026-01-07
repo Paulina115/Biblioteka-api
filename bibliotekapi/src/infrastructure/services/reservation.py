@@ -1,89 +1,110 @@
-# from typing import Iterable
-# from datetime import datetime, timedelta
+"""Module containing reservation service implementation"""
 
-# from src.core.domain.reservation import Reservation
-# from src.core.domain.history import History
-# from src.core.repositories.ireservation import IReservationRepository
-# from src.core.repositories.ibook import IBookRepository
-# from src.core.repositories.ihistory import IHistoryRepository
-# from src.infrastructure.services.ireservation import IReservationService
+from datetime import datetime, timedelta
 
-# class ReservationService(IReservationService):
+from src.infrastructure.dto.reservationdto import ReservationDTO
+from src.infrastructure.dto.historydto import HistoryDTO
+from src.core.domain.reservation import ReservationStatus
+from src.core.domain.history import HistoryStatus
+from src.core.domain.book_copy import BookCopy, BookCopyStatus
+from src.core.repositories.ireservation import IReservationRepository
+from src.core.repositories.ibook_copy import IBookCopyRepository
+from src.core.repositories.ihistory import IHistoryRepository
+from src.infrastructure.services.ireservation import IReservationService
 
-#     _repository: IReservationRepository
-#     _book_repository: IBookRepository
-#     _history_repository: IHistoryRepository
+class ReservationService(IReservationService):
+    """Class implementing reservation service."""
 
-#     def __init__(self, repository: IReservationRepository, book_repository: IBookRepository, history_repository: IHistoryRepository):
-#         self._repository = repository
-#         self._book_repository = book_repository
-#         self._history_repository = history_repository
+    _repository: IReservationRepository
+    _copy_repository: IBookCopyRepository
+    _history_repository: IHistoryRepository
+
+    def __init__(self, repository: IReservationRepository, copy_repository: IBookCopyRepository, history_repository: IHistoryRepository):
+        self._repository = repository
+        self._copy_repository = copy_repository
+        self._history_repository = history_repository
+     
+    async def get_all_reservations(self, status: ReservationStatus | None = None) -> list[ReservationDTO]:
+        """The method getting a all reservations from the repository (Intended for Librarian use).
+            Optionally filter by status.
+
+        Args:
+            status (ReservationStatus | None): status of reservation.
+        
+        Returns:
+            list[ReservationDTO]: The collection of reservations data.
+        """
+        reservations = await self._repository.get_all_reservations()
+        return [ReservationDTO.model_validate(reservation) for reservation in reservations]
+
+    async def get_reservation_by_id(self, reservation_id: int) -> ReservationDTO | None:
+        """The method getting a reservation record from the repository (Intended for Librarian use).
+        
+        Args:
+            reservation_id (int): The id of the reservation.
+
+        Returns:
+            ReservationDTO | None: The reservation data if exists.
+        """
+        reservation = await self._repository.get_reservation_by_id(reservation_id)
+        return ReservationDTO.model_validate(reservation) if reservation else None
+
+    async def get_reservations_by_user(self, user_id: int, status: ReservationStatus | None = None) -> list[ReservationDTO]:
+       """The method getting a reservations for a given user from the repository (Intended for Librarian use).
+            Optionally filter by status.
+        Args:
+            user_id (int): The id of the user.
+            status (ReservationStatus | None): status of reservation.
+        
+        Returns:
+            List[ReservationDTO]: The collection of reservation data for a given user.
+        """
+       reservations = await self._repository.get_reservation_by_user(user_id, status)
+       return [ReservationDTO.model_validate(reservation) for reservation in reservations]
+       
+    async def get_user_reservations(self, user_id: int, status: ReservationStatus | None = None) -> list[ReservationDTO]:
+       """The method getting a reservations for currently authenticated user from the repository.
+            Optionally filter by status.
+
+        Args:
+            user_id (int): The user_id.
+            status (ReservationStatus | None): status of reservation.
+
+        Returns:
+            List[ReservationDTO]: The collection of reservation data for the user.
+        """
+       reservations = await self._repository.get_reservation_by_user(user_id, status)
+       return [ReservationDTO.model_validate(reservation) for reservation in reservations]
+
+    async def add_reservation(self, book_id: int, user_id: int ) -> ReservationDTO | None:
+        """The method adding new reservation to the repository.
+        
+        Args:
+            book_id (int): id of the reserving book.
+            user_id (int): id of the user.
+        Returns:
+            ReservationDTO | None: The newly created reservation record.
+        """
+
+    async def cancel_reservation(self, reservation_id: int) -> ReservationDTO:
+       """The method removing reservation from the repository.
+
+        Args:
+            reservation_id (int): The reservation id.
+
+        Returns:
+            ReservationDTO: Updated reservation record.
+        """
+       
+    async def mark_as_collected(self, reservation_id: int) -> ReservationDTO:
+       """The method changing  reservation status to collected.
+
+        Args:
+            reservation_id (int): The reservation id.
+
+        Returns:
+            ReservationDTO: Updated reservation record.
+        """
+       
     
-#     async def get_all_reservations(self) -> Iterable[Reservation]:
-#        return await self._repository.get_all_reservations()
 
-#     async def get_reservation_by_id(self, id : int) -> Reservation:
-#         return await self._repository.get_reservation_by_id(id)
-    
-#     async def get_reservations_by_user(self, user_id: int) -> Iterable[Reservation]:
-#        return await self._repository.get_reservations_by_user(user_id)
-    
-#     async def get_reservation_by_book(self, book_id: int) -> Reservation:
-#         return await self._repository.get_reservation_by_book(book_id)
-    
-#     async def add_reservation(self, data: Reservation) -> None:
-#         return await self._repository.add_reservation(data)
-
-#     async def update_reservation(self, id: int) -> None:
-#         return await self._repository.update_reservation(id)
-    
-#     async def cancel_reservation(self, id: int) -> None:
-#         return await self._repository.cancel_reservation(id)
-
-#     async def reserve_book(self, user_id: int, book_id: int) -> None:
-#        book = await self._book_repository.get_book_by_id(book_id)
-
-#        if not book.available:
-#            raise Exception("Book is already reserved")
-#        reservation = Reservation(
-#            user_id=user_id,
-#            book_id=book_id,
-#            reservation_date=datetime.now(),
-#            expiration_date=datetime.now() - timedelta(days=7),
-#            status="reserved"
-#        )
-
-#        reserved = await self._repository.add_reservation(reservation)
-
-#        book.available = False
-#        await self._book_repository.update_book(book_id,book)
-
-#        history = History(
-#            user_id=user_id,
-#            book_id=book_id,
-#            borrowed_date=datetime.now(),
-#            due_date=datetime.now() - timedelta(days=7),
-#            status="reserved"
-#        )
-#        await self._history_repository.update_history(history.id,history)
-#        return reserved
-
-#     async def return_book(self, user_id: int, book_id: int) -> None:
-#         reservation = await self._repository.get_reservation_by_book(book_id)
-#         if not reservation or reservation.user_id != user_id:
-#             raise Exception("Reservation not found")
-#         reservation.status = "returned"
-#         await self._repository.update_reservation(reservation.id, reservation)
-
-#         book = await self._book_repository.get_book_by_id(book_id)
-#         book.available = True
-#         await self._book_repository.update_book(book_id,book)
-
-#         history = await self._history_repository.get_history_by_book(book_id)
-#         for h in history:
-#             if h.user_id == user_id and h.book_id == h.book_id and h.status != "returned":
-#                 h.return_date = datetime.now()
-#                 h.status = "returned"
-#                 await self._history_repository.update_history(h.id, h)
-
-#         return reservation
