@@ -7,7 +7,7 @@ from src.core.domain.user import UserRole
 
 class UserDTO(BaseModel):
     """A DTO model for user."""
-    id: UUID4
+    user_id: UUID4
     username: str
     email: EmailStr
     membership_number: str | None = None

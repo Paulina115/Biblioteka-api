@@ -36,7 +36,7 @@ async def get_book_by_id(
     service: IBookService = Depends(Provide[Container.book_service]),
     current_user: UserDTO = Depends(librarian_required)
 ) -> dict:
-    """An endpoint for getting book by id.
+    """An endpoint for getting book by id. (Intended for Librarian use.)
     
     Args:
         book_id (int): The book id.
@@ -153,7 +153,7 @@ async def create_book(
     service: IBookService = Depends(Provide[Container.book_service]),
     current_user: UserDTO = Depends(librarian_required)
 ) -> dict :
-     """An endpoint for creating new book.
+     """An endpoint for creating new book. (Intended for Librarian use.)
     
     Args:
         data (BookCreate): The book data.
@@ -173,7 +173,7 @@ async def update_book(
     service: IBookService = Depends(Provide[Container.book_service]),
     current_user: UserDTO = Depends(librarian_required)
 ) -> dict :
-     """An endpoint for updating book.
+     """An endpoint for updating book. (Intended for Librarian use.)
     
     Args:
         book_id (int): The book id.
@@ -197,7 +197,7 @@ async def delete_book(
     service: IBookService = Depends(Provide[Container.book_service]),
     current_user: UserDTO = Depends(librarian_required)
 ) -> None:
-     """An endpoint for deleting book.
+     """An endpoint for deleting book. (Intended for Librarian use.)
     
     Args:
         book_id (int): The book id.

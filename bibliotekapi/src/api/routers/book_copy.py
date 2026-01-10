@@ -18,7 +18,7 @@ async def get_book_copies_by_id(
     service: IBookCopyService = Depends(Provide[Container.book_copy_service]),
     current_user: UserDTO = Depends(librarian_required)
 ) -> dict:
-    """An endpoint for getting book copies by id.
+    """An endpoint for getting book copies by id. (Intended for Librarian use.)
     
     Args:
         copy_id: id of the book copy.
@@ -41,7 +41,7 @@ async def get_copies_by_book(
     service: IBookCopyService = Depends(Provide[Container.book_copy_service]),
     current_user: UserDTO = Depends(librarian_required)
 ) -> list:
-    """An endpoint for getting book copies of a specific book.
+    """An endpoint for getting book copies of a specific book.(Intended for Librarian use.)
     
     Args:
         book_id: id of the book to retrive copies for.
@@ -78,7 +78,7 @@ async def add_book_copy(
     service: IBookCopyService = Depends(Provide[Container.book_copy_service]),
     current_user: UserDTO = Depends(librarian_required)
 ) -> dict:
-    """An endpoint for adding book copies.
+    """An endpoint for adding book copies. (Intended for Librarian use.)
     
     Args:
         data (BookCopyCreate): The book copy data.
@@ -98,7 +98,7 @@ async def update_copy(
     service: IBookCopyService = Depends(Provide[Container.book_copy_service]),
     current_user: UserDTO = Depends(librarian_required)
 ) -> dict:
-    """An endpoint for updating book copies.
+    """An endpoint for updating book copies. (Intended for Librarian use.)
     
     Args:
         copy_id (int): Id of the book copy.
@@ -121,7 +121,7 @@ async def delete_book_copy(
     service: IBookCopyService = Depends(Provide[Container.book_copy_service]),
     current_user: UserDTO = Depends(librarian_required)
 ) -> None:
-    """An endpoint for removing book copies.
+    """An endpoint for removing book copies. (Intended for Librarian use.)
     
     Args:
         copy_id: id of the book copy.
