@@ -1,7 +1,7 @@
 """Module containing history repository implementation"""
 
 from abc import ABC, abstractmethod
-from uuid import UUID
+from pydantic import UUID4
 
 from src.core.domain.history import HistoryCreate, History, HistoryStatus
 
@@ -33,11 +33,11 @@ class IHistoryRepository(ABC):
         """
 
     @abstractmethod
-    async def get_history_by_user(self, user_id: UUID, status: HistoryStatus | None = None) -> list[History]:
+    async def get_history_by_user(self, user_id: UUID4, status: HistoryStatus | None = None) -> list[History]:
        """The abstract getting a history for a given user from the data storage.
             Optionally filter by status.
         Args:
-            user_id (UUID): The id of the user.
+            user_id (UUID4): The id of the user.
             status (HistoryStatus): The history status.
 
         Returns:
@@ -45,10 +45,10 @@ class IHistoryRepository(ABC):
         """
     
     @abstractmethod
-    async def get_history_by_user_and_copy(self, user_id: UUID, copy_id: int) -> History:
+    async def get_history_by_user_and_copy(self, user_id: UUID4, copy_id: int) -> History:
        """The abstract getting a history for a given user and book copy from the data storage.
         Args:
-            user_id (UUID): The id of the user.
+            user_id (UUID4): The id of the user.
             copy_id (int): The book copy id.
 
         Returns:
@@ -67,12 +67,12 @@ class IHistoryRepository(ABC):
         """
 
     @abstractmethod
-    async def update_history(self, history_id: int, data: HistoryCreate) -> History | None:
+    async def update_history(self, history_id: int, data: History) -> History | None:
         """The abstarct updating history data in the data storage.
         
         Args:
             history_id (int): The history id.
-            data (HistoryCreate): The attributes of the history record.
+            data (History): The attributes of the history record.
 
         Returns:
             History | None: The updated history record.
@@ -89,11 +89,11 @@ class IHistoryRepository(ABC):
             bool: Success of the operation.
         """
     @abstractmethod
-    async def delete_history_by_user(self, user_id: int) -> bool:
+    async def delete_history_by_user(self, user_id: UUID4) -> bool:
        """The abstarct removing all history records for a user from the data storage.
 
         Args:
-            user_id (int): The user id.
+            user_id (UUID4): The user id.
 
         Returns:
             bool: Success of the operation.

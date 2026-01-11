@@ -1,7 +1,7 @@
 """Module containing history service abstractions"""
 
 from abc import ABC, abstractmethod
-from uuid import UUID
+from pydantic import UUID4
 
 from src.infrastructure.dto.historydto import HistoryDTO
 from src.core.domain.history import HistoryStatus
@@ -22,12 +22,12 @@ class IHistoryService(ABC):
         """
 
     @abstractmethod
-    async def get_history_by_user(self, user_id: UUID, status: HistoryStatus | None = None) -> list[HistoryDTO]:
+    async def get_history_by_user(self, user_id: UUID4, status: HistoryStatus | None = None) -> list[HistoryDTO]:
        """The abstract getting a history for a given user from the repository (Intendend for Librarian use).
             Optionally filter by status.
 
         Args:
-            user_id (UUID): The id of the user.
+            user_id (UUID4): The id of the user.
             status: HistoryStatus | None = None: status of a book in history record.
 
         Returns:
@@ -35,12 +35,12 @@ class IHistoryService(ABC):
         """
 
     @abstractmethod
-    async def get_user_history(self, user_id: UUID, status: HistoryStatus | None = None) -> list[HistoryDTO]:
+    async def get_user_history(self, user_id: UUID4, status: HistoryStatus | None = None) -> list[HistoryDTO]:
        """The abstract getting a borrowing history for the currently authenticated user.
           Optionally filter by status.
 
         Args:
-            user_id (UUID): The id of the user.
+            user_id (UUID4): The id of the user.
             status: HistoryStatus | None = None: status of a book in history record.
 
         Returns:
@@ -48,39 +48,37 @@ class IHistoryService(ABC):
         """
        
     @abstractmethod
-    async def mark_as_returned(self, user_id: int, book_copy_id: int) -> HistoryDTO | None:
-       """The abstarct changing borrowed book status to returned.
+    async def mark_as_returned(self, history_id: int) -> HistoryDTO | None:
+       """The abstarct changing borrowed book status to returned (Intended for librarian).
 
         Args:
-            user_id (int): The user id.
-            book_copy_id (int): The book copy id.
+            history_id (int): The history record id.
 
         Returns:
-            HistoryDTO: Updated history data.
+            HistoryDTO | None: Updated history data.
         """
        
     @abstractmethod
-    async def mark_as_borrowed(self, user_id: int, book_copy_id: int) -> HistoryDTO | None:
-       """The abstarct marking book as borrowed in history record.
+    async def mark_as_borrowed(self, user_id: UUID4, copy_id: int) -> HistoryDTO | None:
+       """The abstarct marking book as borrowed in history record (Intended for librarian).
 
         Args:
-            user_id (int): The user id.
-            book_copy_id (int): The book id.
+            user_id (UUID4): The user id.
+            copy_id (int): The book id.
 
         Returns:
-            HistoryDTO: Updated history data.
+            HistoryDTO | None: Updated history data.
         """
        
     @abstractmethod
-    async def prolong_borrowing_period(self, user_id: int, book_copy_id: int, period: int = 7 ) -> HistoryDTO | None:
-       """The abstarct extending the borrowing due date.
+    async def prolong_borrowing_period(self, history_id: int, period: int = 7 ) -> HistoryDTO | None:
+       """The abstarct extending the borrowing due date (Intended for librarian).
 
         Args:
-            user_id (int): The user id.
-            book_copy_id (int): The book copy id.
+            history_id (int): The history record id.
             period (int): Number of days to extend the borrowing period (default is 7).
 
         Returns:
-            HistoryDTO: Updated history data.
+            HistoryDTO | None: Updated history data.
         """
     

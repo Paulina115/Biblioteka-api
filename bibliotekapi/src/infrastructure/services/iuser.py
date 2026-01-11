@@ -22,7 +22,7 @@ class IUserService(ABC):
 
     @abstractmethod
     async def get_user_by_uuid(self, user_id: UUID4) -> UserDTO | None:
-        """The abstract getting a user from the repository.
+        """The abstract getting a user from the repository (Intended for Librarian use).
 
         Args:
             user_id (UUID4): The id of the user.
@@ -64,6 +64,18 @@ class IUserService(ABC):
         """
 
     @abstractmethod
+    async def update_user_username(self, user_id: UUID4, username: str ) -> UserDTO | None:
+        """The abstarct updating user username.
+        
+        Args:
+            user_id (UUID4): The user id.
+            username (str): The updated username.
+
+        Returns:
+            UserDTO | None: The updated user record.
+        """
+
+    @abstractmethod
     async def update_user_email(self, user_id: UUID4, new_email: EmailStr ) -> UserDTO | None:
         """The abstarct updating user email.
         
@@ -83,6 +95,16 @@ class IUserService(ABC):
             user_id (UUID4): The user id.
             new password (str): The new user password.
 
+        Returns:
+            UserDTO | None: The updated user record.
+        """
+    @abstractmethod
+    async def set_role(self, user_id: UUID4) -> UserDTO | None:
+        """The abstarct setting role for the user.
+        
+        Args:
+            user_id (UUID4): The user id.
+            
         Returns:
             UserDTO | None: The updated user record.
         """

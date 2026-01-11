@@ -1,7 +1,7 @@
 """Module containing reservation-related domain models."""
 
 from enum import Enum
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, UUID4
 from datetime import datetime, timedelta
 
 
@@ -18,21 +18,18 @@ class ReservationStatus(str, Enum):
     canceled = "canceled"
     collected = "collected"
 
-
 class ReservationCreate(BaseModel):
     """Model representing reservation's DTO attributes."""
-    user_id: int
+    user_id: UUID4
     copy_id: int
-    status: ReservationStatus = ReservationStatus.active
-
-
 
 class Reservation(ReservationCreate):
     """Model representing reservation's attributes in the database."""
     reservation_id: int | None = None
     reservation_date: datetime = Field(default_factory=lambda: datetime.now())
     expiration_date: datetime = Field(default_factory=lambda: datetime.now() + timedelta(days=3))
-    
+    status: ReservationStatus = ReservationStatus.active
+  
     model_config = ConfigDict(from_attributes=True, extra="ignore")
 
     @property

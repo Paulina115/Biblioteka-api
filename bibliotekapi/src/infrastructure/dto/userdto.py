@@ -11,7 +11,7 @@ class UserDTO(BaseModel):
     username: str
     email: EmailStr
     membership_number: str | None = None
-    role: UserRole.user
+    role: UserRole = UserRole.user
 
     model_config = ConfigDict(
         from_attributes=True,

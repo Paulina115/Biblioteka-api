@@ -16,20 +16,15 @@ class UserRole(str, Enum):
     user = "user"
     librarian = "librarian"
 
-
 class UserCreate(BaseModel):
     """Model for creating a new user."""
     username: str
     email: EmailStr
     password: str 
-    role: UserRole = UserRole.user
-
-
+    
 class User(UserCreate):
     """User model representing a user in the database."""
     user_id: UUID = Field(default_factory=uuid4)
+    role: UserRole = UserRole.user
 
     model_config = ConfigDict(from_attributes=True, extra="ignore")
-
-
-

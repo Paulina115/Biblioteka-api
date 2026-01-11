@@ -1,16 +1,19 @@
 """Module containing book service implementations"""
 
-from src.core.domain.book import Book, BookCreate
+from src.core.domain.book import Book, BookCreate, BookUpdate
+from src.core.domain.book_copy import BookCopyCreate
 from src.core.repositories.ibook import IBookRepository
 from src.infrastructure.services.ibook import IBookService
+from src.infrastructure.services.iunit_of_work import IUnitOfWork
 
 class BookService(IBookService):
     """A class implementing the book service"""
 
     _repository: IBookRepository
 
-    def __init__(self, repository: IBookRepository):
+    def __init__(self, repository: IBookRepository, uow: IUnitOfWork):
         self._repository = repository
+        self._uow = uow
     
     async def get_all_books(self) -> list[Book]:
         """The method getting all books from the repository.
@@ -88,29 +91,39 @@ class BookService(IBookService):
         return await self._repository.filter_books(author, subject, publisher, publication_year, language)
 
 
-    async def add_book(self, data: BookCreate, copies_count: int = 1) -> Book | None:
-        """The method adding new book to the repository.
+    async def add_book(self, data: BookCreate, default_copies_location, copies_count: int = 1) -> Book | None:
+        """The method adding new book to the repository (Intended for librarian).
             Also creates the specified number of copies (BookCopy) for this book.
         
         Args:
             data (BookCreate): The attributes of the book.
+            default_copies_location (str): The default copies location of added book. 
             copies_count (int): Number of copies to create (default=1)
         Returns:
             Book | None: The newly created book.
         """
-        return await self._repository.add_book(data, copies_count)
+        async with self._uow:
+            book = await self._uow.book_repository.add_book(data)
+            if copies_count > 0:
+                for i in range(copies_count):
+                    await self._uow.copy_repository.add_book_copy(BookCopyCreate(book_id=book.book_id,location=default_copies_location))
+            return book
 
-    async def update_book(self, book_id: int, data: BookCreate) -> Book | None:
-        """The method updating book data in the repository.
+    async def update_book(self, book_id: int, data: BookUpdate) -> Book | None:
+        """The method updating book data in the repository (Intended for librarian).
         
         Args:
             book_id (int): The book id.
-            data (BookCreate): The attributes of the book.
+            data (BookUpdate): The attributes of the book.
 
         Returns:
             Book | None: The updated book.
         """
-        return await self._repository.update_book(book_id,data)
+        async with self._uow:
+            updated_book = await self._uow.book_repository.update_book(book_id, data)
+            if not updated_book:
+                return None
+            return updated_book
 
 
     async def remove_book(self, book_id: int) -> bool:
@@ -122,7 +135,8 @@ class BookService(IBookService):
         Returns:
             bool: Success of the operation.
         """
-        return await self._repository.delete_book(book_id)
+        async with self._uow:
+            book = await self._uow.book_repository.delete_book(book_id)
 
     
 

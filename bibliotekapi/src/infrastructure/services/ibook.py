@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 
-from src.core.domain.book import Book, BookCreate
+from src.core.domain.book import Book, BookCreate, BookUpdate
 
 class IBookService(ABC):
     """An abstract class representing protocol of book service"""
@@ -17,7 +17,7 @@ class IBookService(ABC):
 
     @abstractmethod
     async def get_book_by_id(self, book_id: int) -> Book | None:
-        """The abstract getting a book from the repository.
+        """The abstract getting a book from the repository
 
         Args:
             book_id (int): The id of the book.
@@ -83,24 +83,25 @@ class IBookService(ABC):
         """
 
     @abstractmethod
-    async def add_book(self, data: BookCreate, copies_count: int = 1) -> Book | None:
+    async def add_book(self, data: BookCreate, default_copies_location: str, copies_count: int = 1) -> Book | None:
         """The abstract adding new book to the repository.
-            Also creates the specified number of copies (BookCopy) for this book.
+            Also creates the specified number of copies (BookCopy) for this book (Intended for librarian).
         
         Args:
             data (BookCreate): The attributes of the book.
+            default_copies_location (str): The default copies location of added book. 
             copies_count (int): Number of copies to create (default=1)
         Returns:
             Book | None: The newly created book.
         """
 
     @abstractmethod
-    async def update_book(self, book_id: int, data: BookCreate) -> Book | None:
-        """The abstract updating book data in the repository.
+    async def update_book(self, book_id: int, data: BookUpdate) -> Book | None:
+        """The abstract updating book data in the repository (Intended for librarian).
         
         Args:
             book_id (int): The book id.
-            data (BookCreate): The attributes of the book.
+            data (BookUpdate): The attributes of the book.
 
         Returns:
             Book | None: The updated book.
@@ -108,7 +109,7 @@ class IBookService(ABC):
 
     @abstractmethod
     async def remove_book(self, book_id: int) -> bool:
-        """The abstract removing book and all its copies (BookCopy)  from the repository.
+        """The abstract removing book and all its copies (BookCopy)  from the repository (Intended for librarian).
 
         Args:
             book_id (int): The book id.

@@ -3,26 +3,21 @@
 from datetime import datetime, timedelta
 
 from src.infrastructure.dto.reservationdto import ReservationDTO
-from src.infrastructure.dto.historydto import HistoryDTO
 from src.core.domain.reservation import ReservationStatus
 from src.core.domain.history import HistoryStatus
 from src.core.domain.book_copy import BookCopy, BookCopyStatus
 from src.core.repositories.ireservation import IReservationRepository
-from src.core.repositories.ibook_copy import IBookCopyRepository
-from src.core.repositories.ihistory import IHistoryRepository
+from src.infrastructure.services.iunit_of_work import IUnitOfWork
 from src.infrastructure.services.ireservation import IReservationService
 
 class ReservationService(IReservationService):
     """Class implementing reservation service."""
 
     _repository: IReservationRepository
-    _copy_repository: IBookCopyRepository
-    _history_repository: IHistoryRepository
 
-    def __init__(self, repository: IReservationRepository, copy_repository: IBookCopyRepository, history_repository: IHistoryRepository):
+    def __init__(self, repository: IReservationRepository, uow: IUnitOfWork ):
         self._repository = repository
-        self._copy_repository = copy_repository
-        self._history_repository = history_repository
+        self._uow = uow
      
     async def get_all_reservations(self, status: ReservationStatus | None = None) -> list[ReservationDTO]:
         """The method getting a all reservations from the repository (Intended for Librarian use).
@@ -85,6 +80,7 @@ class ReservationService(IReservationService):
         Returns:
             ReservationDTO | None: The newly created reservation record.
         """
+        
 
     async def cancel_reservation(self, reservation_id: int) -> ReservationDTO:
        """The method removing reservation from the repository.
@@ -96,15 +92,7 @@ class ReservationService(IReservationService):
             ReservationDTO: Updated reservation record.
         """
        
-    async def mark_as_collected(self, reservation_id: int) -> ReservationDTO:
-       """The method changing  reservation status to collected.
-
-        Args:
-            reservation_id (int): The reservation id.
-
-        Returns:
-            ReservationDTO: Updated reservation record.
-        """
+   
        
     
 

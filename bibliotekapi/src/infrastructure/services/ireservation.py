@@ -1,6 +1,7 @@
 """Module containing reservation service abstractions"""
 
 from abc import ABC, abstractmethod
+from pydantic import UUID4
 
 from src.core.domain.reservation import ReservationStatus
 from src.infrastructure.dto.reservationdto import ReservationDTO
@@ -34,11 +35,11 @@ class IReservationService(ABC):
         """
 
     @abstractmethod
-    async def get_reservations_by_user(self, user_id: int, status: ReservationStatus | None = None) -> list[ReservationDTO]:
+    async def get_reservations_by_user(self, user_id: UUID4, status: ReservationStatus | None = None) -> list[ReservationDTO]:
        """The abstract getting a reservations for a given user from the repository (Intended for Librarian use).
             Optionally filter by status.
         Args:
-            user_id (int): The id of the user.
+            user_id (UUID4): The id of the user.
             status (ReservationStatus | None): status of reservation.
         
         Returns:
@@ -46,12 +47,12 @@ class IReservationService(ABC):
         """
        
     @abstractmethod
-    async def get_user_reservations(self, user_id: int, status: ReservationStatus | None = None) -> list[ReservationDTO]:
+    async def get_user_reservations(self, user_id: UUID4, status: ReservationStatus | None = None) -> list[ReservationDTO]:
        """The abstract getting a reservations for currently authenticated user from the repository.
             Optionally filter by status.
 
         Args:
-            user_id (int): The user id.
+            user_id (UUID4): The user id.
             status (ReservationStatus | None): status of reservation.
 
         Returns:
@@ -59,18 +60,19 @@ class IReservationService(ABC):
         """
 
     @abstractmethod
-    async def add_reservation(self, book_id: int, user_id: int ) -> ReservationDTO | None:
+    async def add_reservation(self, book_id: int, user_id: UUID4 ) -> ReservationDTO | None:
         """The abstract adding new reservation to the repository.
         
         Args:
             book_id (int): id of the reserving book.
-            user_id (int): id of the user.
+            user_id (UUID4): id of the user.
+            
         Returns:
             ReservationDTO | None: The newly created reservation record.
         """
 
     @abstractmethod
-    async def cancel_reservation(self, reservation_id: int) -> ReservationDTO:
+    async def cancel_reservation(self, reservation_id: int, user: UUID4) -> ReservationDTO:
        """The abstarct removing reservation from the repository.
 
         Args:
@@ -80,16 +82,3 @@ class IReservationService(ABC):
             ReservationDTO: Updated reservation record.
         """
        
-    @abstractmethod
-    async def mark_as_collected(self, reservation_id: int) -> ReservationDTO:
-       """The abstarct changing  reservation status to collected.
-
-        Args:
-            reservation_id (int): The reservation id.
-
-        Returns:
-            ReservationDTO: Updated reservation record.
-        """
-       
-    
-

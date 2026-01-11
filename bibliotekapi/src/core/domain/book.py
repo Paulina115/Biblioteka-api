@@ -1,4 +1,4 @@
-"""Module containing book-related domain models."""
+"""Module containing book related domain models."""
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -14,11 +14,21 @@ class BookCreate(BaseModel):
     publication_year: int | None = None
     language: str = "pl"
 
-
 class Book(BookCreate):
     """Model representing book's attributes in the database."""
     book_id: int | None = None
 
     model_config = ConfigDict(from_attributes=True, extra="ignore")
 
+class BookUpdate(BaseModel):
+    """Module for updating book."""
+    isbn: str | None = None
+    title: str | None
+    authors: list[str] | None
+    subject: list[str] | None
+    description: str | None 
+    publisher: str | None 
+    publication_year: int | None
+    language: str | None
 
+    model_config = ConfigDict(from_attributes=True, extra="ignore")

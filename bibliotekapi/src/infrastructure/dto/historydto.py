@@ -7,8 +7,7 @@ from src.core.domain.history import HistoryStatus
 
 
 class HistoryDTO(BaseModel):
-    """A DTO model for history record."""
-    
+    """A DTO model for history record."""  
     history_id: int
     copy_id: int
     user_id: UUID4

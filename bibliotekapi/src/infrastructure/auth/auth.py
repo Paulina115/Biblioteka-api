@@ -5,7 +5,8 @@ from jose import jwt, JWTError
 from dependency_injector.wiring import inject, Provide
 from src.container import Container
 from src.infrastructure.services.iuser import IUserService
-from src.core.domain.user import UserRole, User
+from src.core.domain.user import UserRole
+from src.infrastructure.dto.userdto import UserDTO
 from src.infrastructure.utils.consts import SECRET_KEY, ALGORITHM
 from fastapi.security import OAuth2PasswordBearer
 
@@ -16,7 +17,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
     service: IUserService = Depends(Provide[Container.user_service])
-) -> User :
+) -> UserDTO :
     """Method returning current user based on token.
 
     Args:
@@ -24,7 +25,7 @@ async def get_current_user(
         service (IUserService): The injected service dependency.
 
     Returns:
-        User: The current user data.
+        UserDTO: The current user data.
     """
     
     try:
@@ -40,14 +41,14 @@ async def get_current_user(
         raise HTTPException(status_code=401, detail="User not found")
     return user
 
-async def librarian_required(current_user: User = Depends(get_current_user)) -> User:
+async def librarian_required(current_user: UserDTO = Depends(get_current_user)) -> UserDTO:
     """Method checking if current user is librarian.
 
     Args:
-        current_user (User): The injected current user dependency.
+        current_user (UserDTO): The injected current user dependency.
 
     Returns:
-        User: The current user data.
+        UserDTO: The current user data.
     """
 
     if current_user.role != UserRole.librarian:

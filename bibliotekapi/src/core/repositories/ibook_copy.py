@@ -53,12 +53,12 @@ class IBookCopyRepository(ABC):
         """
 
     @abstractmethod
-    async def update_book_copy(self, copy_id: int, data: BookCopyCreate) -> BookCopy | None:
+    async def update_book_copy(self, copy_id: int, data: BookCopy) -> BookCopy | None:
         """The abstarct updating book copy  data in the data storage.
         
         Args:
             copy_id (int): The book copy  id.
-            data (BookCopyCreate): The attributes of the book copy.
+            data (BookCopy): The attributes of the book copy.
 
         Returns:
             BookCopy | None: The updated book copy.

@@ -3,6 +3,8 @@ from typing import AsyncGenerator
 
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.exception_handlers import http_exception_handler
+from src.api.error_handlers import domain_exception_handler
+from src.core.exceptions.exceptions import DomainError
 
 from src.api.routers.book import router as book_router
 from src.api.routers.book_copy import router as book_copy_router
@@ -35,6 +37,8 @@ app.include_router(book_copy_router, prefix="/book_copy")
 app.include_router(history_router, prefix="/history")
 app.include_router(reservation_router, prefix="/reservation")
 app.include_router(user_router, prefix="/user")
+
+app.add_exception_handler(DomainError, domain_exception_handler)
 
 
 @app.exception_handler(HTTPException)

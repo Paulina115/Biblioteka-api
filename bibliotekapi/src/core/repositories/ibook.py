@@ -84,24 +84,22 @@ class IBookRepository(ABC):
         """
 
     @abstractmethod
-    async def add_book(self, data: BookCreate, copies_count: int = 1) -> Book | None:
+    async def add_book(self, data: BookCreate) -> Book | None:
         """The abstract adding new book to the data storage.
-            Also creates the specified number of copies (BookCopy) for this book.
         
         Args:
             data (BookCreate): The attributes of the book.
-            copies_count (int): Number of copies to create (default=1)
         Returns:
             Book | None: The newly created book.
         """
 
     @abstractmethod
-    async def update_book(self, book_id: int, data: BookCreate) -> Book | None:
+    async def update_book(self, book_id: int, data: Book) -> Book | None:
         """The abstarct updating book data in the data storage.
         
         Args:
             book_id (int): The book id.
-            data (BookCreate): The attributes of the book.
+            data (Book): The attributes of the book.
 
         Returns:
             Book | None: The updated book.

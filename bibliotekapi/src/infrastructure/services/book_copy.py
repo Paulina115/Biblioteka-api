@@ -1,16 +1,18 @@
 """Module containing book copy service implementation"""
 
-from src.core.domain.book_copy import BookCopy, BookCopyCreate, BookCopyStatus
+from src.core.domain.book_copy import BookCopy, BookCopyCreate, BookCopyStatus, BookCopyUpdate
 from src.core.repositories.ibook_copy import IBookCopyRepository
 from src.infrastructure.services.ibook_copy import IBookCopyService
+from src.infrastructure.services.iunit_of_work import IUnitOfWork
 
 class BookCopyService(IBookCopyService):
     """A class implementing the book copy service"""
     
     _repository: IBookCopyRepository
 
-    def __init__(self, repository: IBookCopyRepository):
+    def __init__(self, repository: IBookCopyRepository, uow: IUnitOfWork):
         self._repository = repository
+        self._uow = uow
     
     async def count_available_copies(self, book_id: int) -> int:
         """the method checking how many copies of the book is available.
@@ -56,19 +58,27 @@ class BookCopyService(IBookCopyService):
         Returns:
             BookCopy | None: The newly created book copy.
         """
-        return await self._repository.add_book_copy(data)
+        async with self._uow:
+            new_copy = await self._uow.copy_repository.add_book_copy(data)
+            if not new_copy:
+                return None
+            return new_copy
 
-    async def update_book_copy(self, copy_id: int, data: BookCopyCreate) -> BookCopy | None:
+    async def update_book_copy(self, copy_id: int, data: BookCopyUpdate) -> BookCopy | None:
         """The abstract updating book copy  data in the repository.(Intended for librarian use).
         
         Args:
             copy_id (int): The book copy  id.
-            data (BookCopyCreate): The attributes of the book copy.
+            data (BookCopyUpdate): The attributes of the book copy.
 
         Returns:
             BookCopy | None: The updated book copy.
         """
-        return await self._repository.update_book_copy(copy_id,data)
+        async with self._uow:
+            updated_copy = await self._uow.copy_repository.update_book_copy(copy_id, data)
+            if not updated_copy:
+                return None
+            return updated_copy
 
     async def remove_book_copy(self, copy_id: int) -> bool:
         """The abstract removing book copy from the repository. (Intended for librarian use).
@@ -79,4 +89,8 @@ class BookCopyService(IBookCopyService):
         Returns:
             bool: Success of the operation.
         """
-        return await self._repository.delete_book_copy(copy_id)
+        async with self._uow:
+            copy = await self._uow.copy_repository.delete_book_copy(copy_id)
+            if not copy:
+                return False
+            return True

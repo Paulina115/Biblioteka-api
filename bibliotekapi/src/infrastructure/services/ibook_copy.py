@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 
-from src.core.domain.book_copy import BookCopy, BookCopyCreate, BookCopyStatus
+from src.core.domain.book_copy import BookCopy, BookCopyCreate, BookCopyStatus, BookCopyUpdate
 
 
 class IBookCopyService(ABC):
@@ -54,12 +54,12 @@ class IBookCopyService(ABC):
         """
 
     @abstractmethod
-    async def update_book_copy(self, copy_id: int, data: BookCopyCreate) -> BookCopy | None:
+    async def update_book_copy(self, copy_id: int, data: BookCopyUpdate) -> BookCopy | None:
         """The abstract updating book copy  data in the repository.(Intended for librarian).
         
         Args:
             copy_id (int): The book copy  id.
-            data (BookCopyCreate): The attributes of the book copy.
+            data (BookCopyUpdate): The attributes of the book copy.
 
         Returns:
             BookCopy | None: The updated book copy.

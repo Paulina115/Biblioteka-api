@@ -1,7 +1,7 @@
 """A repository for user entity."""
 
 from abc import ABC, abstractmethod
-from uuid import UUID
+from pydantic import UUID4
 
 from src.core.domain.user import User, UserCreate
 
@@ -18,11 +18,11 @@ class IUserRepository(ABC):
         """
 
     @abstractmethod
-    async def get_user_by_uuid(self, user_id: UUID) -> User | None:
+    async def get_user_by_uuid(self, user_id: UUID4) -> User | None:
         """The abstract getting a user from the data storage.
 
         Args:
-            user_id (UUID): The id of the user.
+            user_id (UUID4): The id of the user.
         
         Returns:
             User | None: The user data if exists.
@@ -61,23 +61,23 @@ class IUserRepository(ABC):
         """
 
     @abstractmethod
-    async def update_user(self, user_id: UUID, data: UserCreate) -> User | None:
+    async def update_user(self, user_id: UUID4, data: User) -> User | None:
         """The abstarct updating user data in the data storage.
         
         Args:
-            user_id (UUID): The user id.
-            data (UserCreate): The attributes of the user.
+            user_id (UUID4): The user id.
+            data (User): The attributes of the user.
 
         Returns:
             User | None: The updated user.
         """
 
     @abstractmethod
-    async def delete_user(self, user_id: UUID) -> bool:
+    async def delete_user(self, user_id: UUID4) -> bool:
         """The abstarct removing user from the data storage.
 
         Args:
-            user_id (UUID): The user id.
+            user_id (UUID4): The user id.
 
         Returns:
             bool: Success of the operation.
