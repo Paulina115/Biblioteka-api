@@ -4,14 +4,12 @@ from src.core.domain.book_copy import BookCopy, BookCopyCreate, BookCopyStatus, 
 from src.core.repositories.ibook_copy import IBookCopyRepository
 from src.infrastructure.services.ibook_copy import IBookCopyService
 from src.infrastructure.services.iunit_of_work import IUnitOfWork
+from src.core.exceptions.exceptions import CopyNotAvailable
 
 class BookCopyService(IBookCopyService):
     """A class implementing the book copy service"""
-    
-    _repository: IBookCopyRepository
 
-    def __init__(self, repository: IBookCopyRepository, uow: IUnitOfWork):
-        self._repository = repository
+    def __init__(self, uow: IUnitOfWork):
         self._uow = uow
     
     async def count_available_copies(self, book_id: int) -> int:
@@ -23,7 +21,8 @@ class BookCopyService(IBookCopyService):
             Returns:
                 int: The number of available copies of the book.
         """
-        return await self._repository.count_available_copies(book_id)
+        async with self._uow:
+            return await self._uow.copy_repository.count_available_copies(book_id)
 
     async def get_book_copy_by_id(self, copy_id: int) -> BookCopy | None:
         """The method getting a book copy from the repository. (Intended for librarian use).
@@ -34,7 +33,8 @@ class BookCopyService(IBookCopyService):
         Returns:
             BookCopy | None: The book copy data if exists.
         """
-        return await self._repository.get_book_copy_by_id(copy_id)
+        async with self._uow:
+            return await self._uow.copy_repository.get_book_copy_by_id(copy_id)
 
 
     async def get_copies_by_book(self, book_id: int, status: BookCopyStatus | None = None, ) -> list[BookCopy]:
@@ -48,7 +48,8 @@ class BookCopyService(IBookCopyService):
         Returns:
             list[BookCopy]: The collection of the all copies of a specific book.
         """
-        return await self._repository.get_copies_by_book(book_id, status)
+        async with self._uow:
+            return await self._uow.copy_repository.get_copies_by_book(book_id, status)
 
     async def add_book_copy(self, data: BookCopyCreate) -> BookCopy | None:
         """The method adding new book copy to the repository. (Intended for librarian use).
@@ -90,6 +91,9 @@ class BookCopyService(IBookCopyService):
             bool: Success of the operation.
         """
         async with self._uow:
+            available = await self._uow.copy_repository.get_book_copy_by_id(copy_id)
+            if available.status != BookCopyStatus.available:
+                raise CopyNotAvailable()
             copy = await self._uow.copy_repository.delete_book_copy(copy_id)
             if not copy:
                 return False

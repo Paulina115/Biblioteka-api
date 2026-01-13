@@ -49,14 +49,14 @@ async def get_history_by_user(
 
     Args:
         user_id (UUID4): The id of the user.
-        status: HistoryStatus | None = None: status of a book in history record.
+        status (HistoryStatus | None = None) status of a book in history record.
         service (IHistoryService): The injected service dependency.
         current_user (UserDTO): The injected user authentication dependency.
 
     Returns:
         list: The collection of history data for a given user.
     """
-    history = await service.get_history_by_user(user_id)
+    history = await service.get_history_by_user(user_id, status)
     return history
 
 
@@ -79,34 +79,32 @@ async def get_user_history(
         list: The collection of history data for a given user.
     """
     user_id = current_user.user_id
-    history = await service.get_history_by_user(user_id)
+    history = await service.get_history_by_user(user_id, status)
     return history
 
-@router.put("/update", response_model=HistoryDTO)
+@router.patch("/return/{history_id}", response_model=HistoryDTO)
 @inject
 async def mark_as_returned(
-     user_id: UUID4, 
-     copy_id: int,
+     history_id: int,
      service: IHistoryService = Depends(Provide[Container.history_service]),
      current_user: UserDTO = Depends(librarian_required)
 ) -> dict:
     """The endpoint for changing borrowed book status to returned. (Intendend for Librarian use).
 
     Args:
-        user_id (UUID4): The user id.
-        copy_id (int): The book copy id.
+        history_id (int): The history id.
         service (IHistoryService): The injected service dependency.
         current_user (UserDTO): The injected user authentication dependency.
 
     Returns:
         dict: Updated history data.
     """
-    history = await service.mark_as_returned(user_id, copy_id)
+    history = await service.mark_as_returned(history_id)
     if history:
         return history.model_dump()
     raise HTTPException(status_code=404, detail="History not found")
     
-@router.put("/update", response_model=HistoryDTO)
+@router.patch("/borrow/{user_id}/{copy_id}", response_model=HistoryDTO)
 @inject
 async def mark_as_borrowed(
     user_id: UUID4, 
@@ -130,11 +128,10 @@ async def mark_as_borrowed(
         return history.model_dump()
     raise HTTPException(status_code=404, detail="History not found.")
 
-@router.put("/update", response_model=HistoryDTO)
+@router.put("/prolong/{history_id}", response_model=HistoryDTO)
 @inject
 async def prolong_borrowing_period(
-     user_id: UUID4, 
-     copy_id: int, 
+     history_id: int, 
      period: int = 7,
      service: IHistoryService = Depends(Provide[Container.history_service]),
      current_user: UserDTO = Depends(librarian_required) 
@@ -142,8 +139,7 @@ async def prolong_borrowing_period(
     """The endpoint for extending the borrowing due date. (Intendend for Librarian use).
 
     Args:
-        user_id (UUID4): The user id.
-        copy_id (int): The book copy id.
+        history_id (int): The history id.
         period (int): Number of days to extend the borrowing period (default is 7).
         service (IHistoryService): The injected service dependency.
         current_user (UserDTO): The injected user authentication dependency.
@@ -151,7 +147,7 @@ async def prolong_borrowing_period(
     Returns:
         dict: Updated history data.
     """
-    history = await service.prolong_borrowing_period(user_id, copy_id, period)
+    history = await service.prolong_borrowing_period(history_id, period)
     if history:
         return history.model_dump()
     raise HTTPException(status_code=404, detail="History not found.")

@@ -25,4 +25,4 @@ def generate_user_token(user_uuid: UUID4) -> dict:
     jwt_data = {"sub": str(user_uuid), "exp": expire, "type": "confirmation"}
     encoded_jwt = jwt.encode(jwt_data, key=SECRET_KEY, algorithm=ALGORITHM)
 
-    return {"user_token": encoded_jwt, "expires": expire}
+    return {"access_token": encoded_jwt, "token_type": "Bearer", "expires": expire}

@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from src.container import Container
 from src.infrastructure.services.ibook import IBookService
-from src.core.domain.book import Book, BookCreate
+from src.core.domain.book import Book, BookCreate, BookUpdate
 from src.infrastructure.dto.userdto import UserDTO
 from src.infrastructure.auth.auth import librarian_required
 
@@ -67,9 +67,8 @@ async def get_by_title(
         dict: The book attributes.
     """
     books = await service.get_book_by_title(title)
-    if books:
-        return books
-    raise HTTPException(status_code=404, detail="Book not found")
+    return books
+    
 
 @router.get("/author/{author}", response_model=list[Book])
 @inject
@@ -87,9 +86,7 @@ async def get_by_author(
         list: The book attributes collections.
     """
     books = await service.get_book_by_author(author)
-    if books:
-        return books
-    raise HTTPException(status_code=404, detail="Book not found")
+    return books
 
 @router.get("/isbn/{isbn}", response_model=Book)
 @inject
@@ -141,15 +138,14 @@ async def filter_by_category(
         publication_year=publication_year,
         language=language,
     )
-    if books:
-        return books
-    raise HTTPException(status_code=404, detail="Books not found")
-    
-
+    return books
+        
 @router.post("/create", response_model=Book, status_code=201)
 @inject
 async def create_book(
     data: BookCreate,
+    default_copies_location: str,
+    copies_count: int | None = 1,
     service: IBookService = Depends(Provide[Container.book_service]),
     current_user: UserDTO = Depends(librarian_required)
 ) -> dict :
@@ -157,19 +153,24 @@ async def create_book(
     
     Args:
         data (BookCreate): The book data.
+        default_copies_location (str): Location for copies.
+        copies_count (int | None): Number of copies.
         service (IBookService): The injected service dependency.
         current_user (UserDTO): The injected user authentication dependency.
 
     Returns:
         dict: The created book attributes.
     """
-     return await service.add_book(data)
+     book = await service.add_book(data, default_copies_location, copies_count)
+     if book:
+        return book.model_dump()
+     raise HTTPException(status_code=404, detail="Book not found")
 
-@router.put("/update", response_model=Book)
+@router.patch("/update", response_model=Book)
 @inject
 async def update_book(
     book_id: int,
-    data: BookCreate,
+    data: BookUpdate,
     service: IBookService = Depends(Provide[Container.book_service]),
     current_user: UserDTO = Depends(librarian_required)
 ) -> dict :
@@ -177,7 +178,7 @@ async def update_book(
     
     Args:
         book_id (int): The book id.
-        data (BookCreate): Data for updating the book.
+        data (BookUpdate): Data for updating the book.
         service (IBookService): The injected service dependency.
         current_user (UserDTO): The injected user authentication dependency.
 

@@ -28,3 +28,8 @@ class User(UserCreate):
     role: UserRole = UserRole.user
 
     model_config = ConfigDict(from_attributes=True, extra="ignore")
+
+class UserLogin(BaseModel):
+    """User model for authentication"""
+    email: EmailStr
+    password: str

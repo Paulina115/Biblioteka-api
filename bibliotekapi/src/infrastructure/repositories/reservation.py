@@ -100,7 +100,7 @@ class ReservationRepository(IReservationRepository):
         if reservation:
             for field, value in data.model_dump().items():
                 setattr(reservation, field, value)
-            self._session.flush()
+            await self._session.flush()
             return ReservationDomain.model_validate(reservation)
         return None
 

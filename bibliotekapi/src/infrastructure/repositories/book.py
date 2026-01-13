@@ -117,11 +117,9 @@ class BookRepository(IBookRepository):
 
     async def add_book(self, data: BookCreate, copies_count: int = 1) -> BookDomain | None:
         """The method adding new book to the data storage.
-            Also creates the specified number of copies (BookCopy) for this book.
         
         Args:
             data (BookCreate): The attributes of the book.
-            copies_count (int): Number of copies to create (default=1)
         Returns:
             BookDomain | None: The newly created book.
         """

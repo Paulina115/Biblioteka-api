@@ -6,8 +6,8 @@ from pydantic import BaseModel, ConfigDict
 
 class TokenDTO(BaseModel):
     """A DTO model for token details."""
+    access_token: str
     token_type: str
-    user_token: str
     expires: datetime
 
     model_config = ConfigDict(

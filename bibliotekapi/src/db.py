@@ -1,4 +1,4 @@
-"""A module providing database acces"""
+"""A module providing database access"""
 
 from __future__ import annotations
 
@@ -77,9 +77,9 @@ class History(Base):
     history_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     copy_id: Mapped[int] = mapped_column(ForeignKey("book_copy.copy_id"))
     user_id: Mapped[UUID] = mapped_column(ForeignKey("user.user_id"))
-    borrowed_date: Mapped[datetime] = mapped_column(default=datetime.now(), nullable=False)
+    borrowed_date: Mapped[datetime] = mapped_column(default=lambda:datetime.now(), nullable=False)
     return_date: Mapped[datetime | None]
-    due_date: Mapped[datetime] = mapped_column(default=datetime.now()+timedelta(days=14), nullable=False)
+    due_date: Mapped[datetime] = mapped_column(default=lambda:datetime.now()+timedelta(days=14), nullable=False)
     status: Mapped[HistoryStatus] = mapped_column(Enum(HistoryStatus), default=HistoryStatus.borrowed, nullable=False)
 
     copy: Mapped[BookCopy] = relationship("BookCopy", back_populates="histories")

@@ -6,8 +6,13 @@ from src.core.exceptions.exceptions import *
 DOMAIN_EXCEPTION_MAPPING = {
     CopyNotFound: (404, "Copy not found"),
     UserNotFound: (404, "User not found"),
+    BookNotFound: (404, "Book not found"),
     CopyNotAvailable: (409, "Copy is currently not available"),
-    BookNotBorrowed: (400, "This copy is not borrowed"),
+    BookNotAvailable: (409, "Book is currently not available"),
+    BookNotBorrowed: (409, "This copy is not borrowed"),
+    EmailAlreadyExist: (409, "This email already exist"),
+    BookBorrowed: (409, "One or more copy of this book is currently borrowed"),
+    ISBNAlreadyExist: (409, "This isbn already exist")
 }
 
 

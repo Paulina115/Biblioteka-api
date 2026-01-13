@@ -72,13 +72,13 @@ class IReservationService(ABC):
         """
 
     @abstractmethod
-    async def cancel_reservation(self, reservation_id: int, user: UUID4) -> ReservationDTO:
-       """The abstarct removing reservation from the repository.
+    async def cancel_reservation(self, reservation_id: int) -> ReservationDTO | None:
+       """The abstarct fro cancellng  reservation.
 
         Args:
             reservation_id (int): The reservation id.
 
         Returns:
-            ReservationDTO: Updated reservation record.
+            ReservationDTO | None: Updated reservation record.
         """
        

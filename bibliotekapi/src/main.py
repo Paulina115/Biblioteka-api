@@ -21,6 +21,7 @@ container.wire(modules=[
     "src.api.routers.history",
     "src.api.routers.reservation",
     "src.api.routers.user",
+    "src.infrastructure.auth.auth",
 ])
 
 
@@ -28,6 +29,10 @@ container.wire(modules=[
 async def lifespan(_: FastAPI) -> AsyncGenerator:
     """Lifespan function working on app startup."""
     await init_db()
+
+    user_service = container.user_service()
+    await user_service.create_admin_if_not_exists()
+
     yield
 
 

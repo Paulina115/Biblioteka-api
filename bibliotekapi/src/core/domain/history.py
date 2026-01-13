@@ -26,7 +26,7 @@ class History(HistoryCreate):
     history_id: int | None = None
     borrowed_date: datetime = Field(default_factory=lambda: datetime.now())
     due_date: datetime = Field(default_factory=lambda: datetime.now() + timedelta(days=14))
-    return_date: datetime | None
+    return_date: datetime | None = None
     status: HistoryStatus = HistoryStatus.borrowed
     
     model_config = ConfigDict(from_attributes=True, extra="ignore")

@@ -124,7 +124,7 @@ async def add_reservation(
         return reservation.model_dump()
     raise HTTPException(status_code=404, detail="Reservation not found")
 
-@router.put("/update", response_model=ReservationDTO)
+@router.patch("/cancel", response_model=ReservationDTO)
 @inject
 async def cancel_reservation(
     reservation_id: int,
@@ -146,27 +146,7 @@ async def cancel_reservation(
         return reservation.model_dump()
     raise HTTPException(status_code=404, detail="Reservation not found")
 
-@router.put("/update", response_model=ReservationDTO)
-@inject
-async def mark_as_collected(
-    reservation_id: int,
-    service: IReservationService = Depends(Provide[Container.reservation_service]),
-    current_user: UserDTO = Depends(librarian_required)
-) -> dict:
-    """The endpoint for changing  reservation status to collected. (Intendend for Librarian use)
 
-    Args:
-        reservation_id (int): The reservation id.
-        service (IHistoryService): The injected service dependency.
-        current_user (UserDTO): The injected user authentication dependency.
-
-    Returns:
-        dict: Updated reservation record.
-    """
-    reservation = await service.mark_as_collected(reservation_id)
-    if reservation:
-        return reservation.model_dump()
-    raise HTTPException(status_code=404, detail="Reservation not found")
 
 
     

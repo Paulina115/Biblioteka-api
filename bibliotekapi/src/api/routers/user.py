@@ -1,12 +1,14 @@
 """A module containing user routers"""
 
 from dependency_injector.wiring import inject, Provide
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Body
 from pydantic import UUID4, EmailStr
+from fastapi.security import OAuth2PasswordRequestForm
+
 
 from src.container import Container
 from src.infrastructure.services.iuser import IUserService
-from src.core.domain.user import UserCreate
+from src.core.domain.user import UserCreate, UserRole, UserLogin, User
 from src.infrastructure.dto.userdto import UserDTO
 from src.infrastructure.dto.tokendto import TokenDTO
 from src.infrastructure.auth.auth import librarian_required, get_current_user
@@ -18,7 +20,7 @@ router = APIRouter()
 @inject
 async def get_all_users(
     service: IUserService = Depends(Provide[Container.user_service]),
-    current_user: UserDTO = Depends(librarian_required)
+    # current_user: UserDTO = Depends(librarian_required)
 ) -> list:
     """The endpoint for getting all users from the repository (Intended for Librarian use).
 
@@ -101,20 +103,45 @@ async def get_user_by_username(
 async def register_user(
     data: UserCreate,
     service: IUserService = Depends(Provide[Container.user_service]),
-    current_user: UserDTO = Depends(librarian_required)
 ) -> dict:
     """The endpoint for registering a new user.
     
     Args:
         data (UserCreate): The attributes of the user.
         service (IHistoryService): The injected service dependency.
-        current_user (UserDTO): The injected user authentication dependency.
     
     Returns:
         dict: The newly registered user.
     """
+    user = await service.register_user(data)
+    if user:
+        return user.model_dump()
+    raise HTTPException(status_code=404, detail="User not found.")
 
-@router.put("/update", response_model=UserDTO)
+@router.patch("/update/username", response_model=UserDTO)
+@inject
+async def update_user_username(
+    username: str,
+    service: IUserService = Depends(Provide[Container.user_service]),
+    current_user: UserDTO = Depends(get_current_user)
+) -> dict:
+    """The endpoint for updating user username.
+    
+    Args:
+        username (str): The new user username.
+        service (IUserService): The injected service dependency.
+        current_user (UserDTO): The injected user authentication dependency.
+
+    Returns:
+        dict: The updated user record.
+    """
+    user_id = current_user.user_id
+    user = await service.update_user_username(user_id, username)
+    if user:
+        return user.model_dump()
+    raise HTTPException(status_code=404, detail="User not found")
+
+@router.patch("/update/email", response_model=UserDTO)
 @inject
 async def update_user_email(
     new_email: EmailStr,
@@ -137,10 +164,10 @@ async def update_user_email(
         return user.model_dump()
     raise HTTPException(status_code=404, detail="User not found")
 
-@router.put("/update", response_model=UserDTO)
+@router.patch("/update/password", response_model=UserDTO)
 @inject
 async def change_user_password(
-    new_password: str,
+    data: dict = Body(..., example={"password": "newpassword"}),
     service: IUserService = Depends(Provide[Container.user_service]),
     current_user: UserDTO = Depends(get_current_user)
 ) -> dict:
@@ -155,34 +182,57 @@ async def change_user_password(
         dict: The updated user record.
     """
     user_id = current_user.user_id
-    user = await service.change_user_password(user_id, new_password)
+    user = await service.change_user_password(user_id, data["password"])
+    return user.model_dump()
     if user:
         return user.model_dump()
     raise HTTPException(status_code=404, detail="User not found")
 
-@router.post("/token", response_model=TokenDTO, status_code=200)
+@router.patch("/set_role", response_model=UserDTO)
 @inject
-async def authenticate_user(
-    user: UserCreate,
+async def set_user_role(
+    user_id: UUID4,
+    role: UserRole,
     service: IUserService = Depends(Provide[Container.user_service]),
-) -> TokenDTO | None:
-    """The endpoint for  authenticating the user.
-
-    Args:
-        user (UserCreate): The user data.
-        service (IUserService): The injected service dependency.
+) -> dict:
+    """The endpoint for setting user role.
     
-    Returns:
-        TokenDTO | None: The token details.
-    """
-    if token_details := await service.authenticate_user(user):
-        print("user confirmed")
-        return token_details.model_dump()
+    Args:
+        user_id (UUID4): The user id.
+        role (UserRole): The user role to set.
+        service (IUserService): The injected service dependency.
 
-    raise HTTPException(
-        status_code=401,
-        detail="Provided incorrect credentials",
-    )
+    Returns:
+        dict: The updated user record.
+    """
+    user = await service.set_role(user_id, role)
+    if user:
+        return user.model_dump()
+    raise HTTPException(status_code=404, detail="User not found")
+
+from fastapi.security import OAuth2PasswordRequestForm
+
+@router.post("/login", response_model=TokenDTO)
+@inject
+async def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    service: IUserService = Depends(Provide[Container.user_service])
+):
+    """The endpoint for authenticate user.
+    
+    Args:
+        form data (OAuth2PasswordRequestForm): The user login data.
+        service (IUserService): The injected service dependency.
+
+    Returns:
+        dict: The updated user record.
+    """
+    user_login = UserLogin(email=form_data.username, password=form_data.password)
+    token_details = await service.authenticate_user(user_login)
+    if token_details:
+        return token_details.model_dump()
+    raise HTTPException(status_code=401, detail="Invalid credentials")
+
 
 
     

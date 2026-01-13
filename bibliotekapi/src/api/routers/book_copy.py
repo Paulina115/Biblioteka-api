@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from src.container import Container
 from src.infrastructure.services.ibook_copy import IBookCopyService
-from src.core.domain.book_copy import BookCopy, BookCopyCreate, BookCopyStatus
+from src.core.domain.book_copy import BookCopy, BookCopyCreate, BookCopyStatus, BookCopyUpdate
 from src.infrastructure.dto.userdto import UserDTO
 from src.infrastructure.auth.auth import librarian_required
 
@@ -37,7 +37,7 @@ async def get_book_copies_by_id(
 @inject
 async def get_copies_by_book(
     book_id: int,
-    status: BookCopyStatus,
+    status: BookCopyStatus | None = None,
     service: IBookCopyService = Depends(Provide[Container.book_copy_service]),
     current_user: UserDTO = Depends(librarian_required)
 ) -> list:
@@ -45,6 +45,7 @@ async def get_copies_by_book(
     
     Args:
         book_id: id of the book to retrive copies for.
+        status (BookCopyStatus | None)
         service (IBookCopyService): The injected service dependency.
         current_user (UserDTO): The injected user authentication dependency.
 
@@ -88,13 +89,16 @@ async def add_book_copy(
     Returns:
         dict : The book copy attributes.
     """
-    return await service.add_book_copy(data)
+    copy = await service.add_book_copy(data)
+    if copy:
+        return copy.model_dump()
+    raise HTTPException(status_code=404, detail="Copy not found")
 
-@router.put("/update", response_model=BookCopy)
+@router.patch("/update", response_model=BookCopy)
 @inject
 async def update_copy(
     copy_id: int,
-    data: BookCopyCreate,
+    data: BookCopyUpdate,
     service: IBookCopyService = Depends(Provide[Container.book_copy_service]),
     current_user: UserDTO = Depends(librarian_required)
 ) -> dict:
@@ -102,7 +106,7 @@ async def update_copy(
     
     Args:
         copy_id (int): Id of the book copy.
-        data (BookCopyCreate): The book copy data.
+        data (BookCopyUpdate): The book copy data.
         service (IBookCopyService): The injected service dependency.
         current_user (UserDTO): The injected user authentication dependency.
 
@@ -111,7 +115,7 @@ async def update_copy(
     """
     updated = await service.update_book_copy(copy_id, data)
     if updated:
-        return updated
+        return updated.model_dump()
     raise HTTPException(status_code=404, detail="Book copy not found")
     
 @router.delete("/delete", status_code=204)

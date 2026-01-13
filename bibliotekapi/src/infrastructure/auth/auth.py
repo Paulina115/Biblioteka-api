@@ -9,9 +9,9 @@ from src.core.domain.user import UserRole
 from src.infrastructure.dto.userdto import UserDTO
 from src.infrastructure.utils.consts import SECRET_KEY, ALGORITHM
 from fastapi.security import OAuth2PasswordBearer
+from uuid import UUID
 
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login")
 
 @inject
 async def get_current_user(
@@ -36,6 +36,7 @@ async def get_current_user(
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
     
+    user_id = UUID(payload["sub"])
     user = await service.get_user_by_uuid(user_id)
     if not user:
         raise HTTPException(status_code=401, detail="User not found")

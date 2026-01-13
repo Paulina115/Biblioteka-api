@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 from pydantic import UUID4, EmailStr
 
-from src.core.domain.user import UserCreate
+from src.core.domain.user import UserCreate, UserRole, UserLogin
 from src.infrastructure.dto.userdto import UserDTO
 from src.infrastructure.dto.tokendto import TokenDTO
 
@@ -99,26 +99,32 @@ class IUserService(ABC):
             UserDTO | None: The updated user record.
         """
     @abstractmethod
-    async def set_role(self, user_id: UUID4) -> UserDTO | None:
+    async def set_role(self, user_id: UUID4, role: UserRole) -> UserDTO | None:
         """The abstarct setting role for the user.
         
         Args:
             user_id (UUID4): The user id.
-            
+            role (UserRole): The rolr to set.
+
         Returns:
             UserDTO | None: The updated user record.
         """
 
     @abstractmethod
-    async def authenticate_user(self, user: UserCreate) -> TokenDTO | None:
+    async def authenticate_user(self, user: UserLogin) -> TokenDTO | None:
         """The method authenticating the user.
 
         Args:
-            user (UserCreate): The user data.
+            user (UserLogin): The user data.
 
         Returns:
             TokenDTO | None: The token details.
         """
 
+    @abstractmethod
+    async def create_admin_if_not_exists(self):
+        """The abstract creates a default admin/librarian user if one does not already exist."""
+
+    
     
     

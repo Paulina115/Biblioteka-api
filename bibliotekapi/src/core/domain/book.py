@@ -23,12 +23,12 @@ class Book(BookCreate):
 class BookUpdate(BaseModel):
     """Module for updating book."""
     isbn: str | None = None
-    title: str | None
-    authors: list[str] | None
-    subject: list[str] | None
-    description: str | None 
-    publisher: str | None 
-    publication_year: int | None
-    language: str | None
+    title: str | None = None
+    authors: list[str] | None = None
+    subject: list[str] | None = None
+    description: str | None = None
+    publisher: str | None = None
+    publication_year: int | None = None
+    language: str | None = None
 
     model_config = ConfigDict(from_attributes=True, extra="ignore")
