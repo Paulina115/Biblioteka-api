@@ -1,39 +1,43 @@
-# Biblioteka API
+# Library API
 
-Aplikacja w **FastAPI** do zarządzania biblioteką (użytkownicy, książki, rezerwacje, historia wypożyczeń) w **architekturze cebulowej**, z autoryzacją JWT i obsługą **asynchronicznej bazy danych**.
-
----
-
-## Stos technologiczny
-
-- **Python 3.12** – logika backendu, OOP, programowanie asynchroniczne  
-- **FastAPI** – REST API, walidacja danych (Pydantic), dependency injection  
-- **SQLAlchemy 2.0 (async)** – ORM, relacje, zapytania  
-- **PostgreSQL** – baza danych  
-- **JWT / OAuth2** – autoryzacja i role użytkowników  
-- **Dependency Injector** – zarządzanie zależnościami  
-- **Docker** – konteneryzacja  
+A **FastAPI-based** application for managing a library system  
+(users, books, reservations, borrowing history), built using  
+**Onion Architecture**, with **JWT authentication** and  
+**asynchronous database support**.
 
 ---
 
-## Funkcjonalności
+## 🛠 Tech Stack
 
-- Zarządzanie użytkownikami (rejestracja, aktualizacja, role, logowanie)  
-- Obsługa książek i ich kopii (dodawanie, aktualizacja, dostępność)  
-- Rezerwacje książek i historia wypożyczeń  
-- Autoryzacja i role użytkowników (user, librarian)  
+- **Python 3.12** – backend logic, OOP, asynchronous programming
+- **FastAPI** – REST API, data validation (Pydantic), dependency injection
+- **SQLAlchemy 2.0 (async)** – ORM, relationships, queries
+- **PostgreSQL** – relational database
+- **JWT / OAuth2** – authentication and user roles
+- **Dependency Injector** – dependency management
+- **Docker** – containerization
 
 ---
 
-## Uruchomienie
+## ✨ Features
 
-1. Sklonuj repozytorium:
-   
+- User management (registration, update, roles, authentication)
+- Book and book copy management (create, update, availability tracking)
+- Book reservations and borrowing history
+- Role-based authorization (`user`, `librarian`)
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
 git clone https://github.com/Paulina115/Biblioteka-api.git
+cd library-api
 
-Zbuduj i uruchom kontener:
+### 2. Run with Docker
 
 docker-compose up --build
+
 
 
 
