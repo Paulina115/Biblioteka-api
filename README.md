@@ -29,12 +29,12 @@ Aplikacja w **FastAPI** do zarządzania biblioteką (użytkownicy, książki, re
 
 1. Sklonuj repozytorium:
    
-git clone https://github.com/twoj_uzytkownik/biblioteka-api.git
-cd biblioteka-api
+git clone https://github.com/Paulina115/Biblioteka-api.git
 
 Zbuduj i uruchom kontener:
 
 docker-compose up --build
+
 
 
 
